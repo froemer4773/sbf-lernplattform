@@ -1,4 +1,4 @@
-# SBF-Lernplattform Backend - Angepasst für Ihre Datenbank
+# SBF-Lernplattform Backend
 
 ## ✅ Anpassungen
 
