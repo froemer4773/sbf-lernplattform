@@ -1,0 +1,58 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <div class="header-content">
+      <h1>SBF-Lernplattform</h1>
+      <div class="user-info">
+        <span class="user-greeting" *ngIf="user">
+          Hallo, <strong>{{ user.vorname }}</strong>!
+        </span>
+        <span class="user-greeting" *ngIf="!user">
+          Hallo!
+        </span>
+        <button (click)="logout()" class="btn-logout">Abmelden</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard-main">
+    <div class="welcome-section">
+      <h2>Willkommen zurück<span *ngIf="user">, {{ user.vorname }}</span>!</h2>
+      <p>Wähle einen Bereich, um mit dem Lernen zu beginnen.</p>
+    </div>
+
+    <div class="cards-grid">
+      <div class="card card-learn" (click)="startLearning()">
+        <div class="card-icon">
+          <div class="icon-circle icon-learn-bg">
+            <span class="icon-text">L</span>
+          </div>
+        </div>
+        <h3>Lernen</h3>
+        <p>Übe nach Kategorien oder Kapiteln</p>
+        <button class="btn-card">Jetzt lernen</button>
+      </div>
+
+      <div class="card card-exam" (click)="startExam()">
+        <div class="card-icon">
+          <div class="icon-circle icon-exam-bg">
+            <span class="icon-text">P</span>
+          </div>
+        </div>
+        <h3>Prüfung</h3>
+        <p>Simuliere die echte Prüfung</p>
+        <button class="btn-card">Prüfung starten</button>
+      </div>
+
+      <div class="card card-stats" (click)="viewStatistics()">
+        <div class="card-icon">
+          <div class="icon-circle icon-stats-bg">
+            <span class="icon-text">S</span>
+          </div>
+        </div>
+        <h3>Statistiken</h3>
+        <p>Verfolge deinen Fortschritt</p>
+        <button class="btn-card">Statistiken ansehen</button>
+      </div>
+    </div>
+  </main>
+</div>
