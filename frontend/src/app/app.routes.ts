@@ -31,6 +31,10 @@ export const routes: Routes = [
       {
         path: 'question-view',
         loadComponent: () => import('./components/learning/question-view/question-view.component').then(m => m.QuestionViewComponent)
+      },
+      {
+        path: 'questions/:schein/:kategorie',
+        loadComponent: () => import('./components/learning/question-view/question-view.component').then(m => m.QuestionViewComponent)
       }
     ]
   },

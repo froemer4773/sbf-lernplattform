@@ -3,7 +3,8 @@
     "allow": [
       "Bash(cat:*)",
       "Bash(npm install:*)",
-      "Bash(npm start -- --proxy-config proxy.conf.json)"
+      "Bash(npm start -- --proxy-config proxy.conf.json)",
+      "Bash(npm start)"
     ],
     "deny": [],
     "ask": []

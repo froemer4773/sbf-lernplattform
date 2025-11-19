@@ -1,1 +1,64 @@
-<p>category-selection works!</p>
+<div class="category-selection-container">
+  <div class="header">
+    <h1>Lernbereich</h1>
+    <p>Wähle einen Führerschein und eine Kategorie zum Lernen</p>
+  </div>
+
+  @if (error(); as errorMsg) {
+    <div class="error-message">
+      {{ errorMsg }}
+      <button (click)="loadLicenses()">Erneut versuchen</button>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="loading">
+      <p>Lädt Daten...</p>
+    </div>
+  } @else {
+    <div class="content">
+      <!-- Lizenz-Auswahl -->
+      <div class="licenses-section">
+        <h2>Führerscheinart</h2>
+        <div class="licenses-grid">
+          @for (license of licenses(); track license.name) {
+            <button
+              class="license-button"
+              [class.active]="selectedLicense() === license.name"
+              (click)="selectLicense(license)"
+            >
+              {{ license.name }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Kategorien -->
+      @if (categories().length > 0) {
+        <div class="categories-section">
+          <h2>Kategorien für {{ selectedLicense() }}</h2>
+          <div class="categories-grid">
+            @for (category of categories(); track category.kategorie) {
+              <a
+                [routerLink]="['/learning/questions', selectedLicense(), category.kategorie]"
+                class="category-card"
+              >
+                <h3>{{ category.kategorie }}</h3>
+                @if (category.unterkategorien && category.unterkategorien.length > 0) {
+                  <div class="subcategories">
+                    <p class="count">{{ category.unterkategorien.length }} Unterkategorien</p>
+                    <ul>
+                      @for (sub of category.unterkategorien; track sub.name) {
+                        <li>{{ sub.name }} ({{ sub.fragen_anzahl }} Fragen)</li>
+                      }
+                    </ul>
+                  </div>
+                }
+              </a>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -1,1 +1,107 @@
-<p>question-view works!</p>
+<div class="question-view-container">
+  <div class="header">
+    <a [routerLink]="['/learning/category-selection']" class="back-link">← Zurück</a>
+    <h1>{{ schein() }} - {{ kategorie() }}</h1>
+  </div>
+
+  @if (error(); as errorMsg) {
+    <div class="error-message">
+      {{ errorMsg }}
+      <button (click)="loadQuestions(schein(), kategorie())">Erneut versuchen</button>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="loading">
+      <p>Lädt Fragen...</p>
+    </div>
+  } @else {
+    <div class="content">
+      <!-- Progress Bar -->
+      <div class="progress-section">
+        <div class="progress-info">
+          <span>Frage {{ progress().current }} von {{ progress().total }}</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="progress().percentage"></div>
+        </div>
+      </div>
+
+      <!-- Question -->
+      @if (currentQuestion(); as question) {
+        <div class="question-card">
+          <div class="question-header">
+            <h2>{{ question.frage_text }}</h2>
+            @if (question.has_image) {
+              <div class="question-image">
+                <img [src]="apiService.getQuestionImageUrl(question.frage_id)" alt="Frage Bild" />
+              </div>
+            }
+          </div>
+
+          <!-- Answers -->
+          <div class="answers-section">
+            @for (answer of question.antworten; track answer.buchstabe) {
+              <label class="answer-option" [class.selected]="getAnswerStatus(answer.buchstabe) === 'selected'">
+                <input
+                  type="radio"
+                  [value]="answer.buchstabe"
+                  [checked]="getAnswerStatus(answer.buchstabe) === 'selected'"
+                  (change)="selectAnswer(answer.buchstabe)"
+                  name="answer"
+                />
+                <span class="answer-letter">{{ answer.buchstabe }}</span>
+                <span class="answer-text">{{ answer.text }}</span>
+              </label>
+            }
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="actions">
+            <button
+              [disabled]="currentQuestionIndex() === 0"
+              (click)="previousQuestion()"
+              class="btn btn-secondary"
+            >
+              ← Vorherige
+            </button>
+            <button (click)="submitAnswer()" class="btn btn-primary">
+              Antwort einreichen
+            </button>
+            <button
+              [disabled]="currentQuestionIndex() === questions().length - 1"
+              (click)="nextQuestion()"
+              class="btn btn-secondary"
+            >
+              Nächste →
+            </button>
+          </div>
+        </div>
+
+        <!-- Question Navigator -->
+        <div class="navigator-section">
+          <h3>Fragen Navigation</h3>
+          <div class="question-navigator">
+            @for (question of questions(); track question.frage_id; let i = $index) {
+              <button
+                [class.current]="i === currentQuestionIndex()"
+                [class.answered]="selectedAnswers().has(question.frage_id)"
+                (click)="goToQuestion(i)"
+                class="nav-button"
+              >
+                {{ i + 1 }}
+              </button>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="no-questions">
+          <p>Keine Fragen verfügbar</p>
+          <a [routerLink]="['/learning/category-selection']" class="btn btn-primary">
+            Zurück zur Kategorie-Auswahl
+          </a>
+        </div>
+      }
+    </div>
+  }
+</div>
