@@ -1,10 +1,11 @@
 {
   "/api": {
-    "target": "http://lernapp.4roemer.de",
+    "target": "https://lernapp.4roemer.de",
     "secure": false,
     "changeOrigin": true,
     "pathRewrite": {
       "^/api": "/api"
-    }
+    },
+    "logLevel": "debug"
   }
 }
