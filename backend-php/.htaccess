@@ -1,0 +1,61 @@
+# PHP Backend API - Main .htaccess
+# Platzieren in: /api/.htaccess
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /api/
+    
+    # CORS Preflight Requests
+    RewriteCond %{REQUEST_METHOD} OPTIONS
+    RewriteRule ^(.*)$ $1 [R=200,L]
+    
+    # Auth Routes
+    RewriteRule ^auth/login/?$ auth/login.php [L]
+    RewriteRule ^auth/register/?$ auth/register.php [L]
+    
+    # Questions Routes
+    RewriteRule ^questions/?$ questions/index.php [L,QSA]
+    RewriteRule ^questions/([0-9]+)/?$ questions/question.php?id=$1 [L,QSA]
+    RewriteRule ^questions/([0-9]+)/image/?$ questions/image.php?id=$1 [L]
+    
+    # Categories Routes
+    RewriteRule ^categories/([^/]+)/?$ categories/categories.php?schein=$1 [L,QSA]
+    
+    # Licenses Routes
+    RewriteRule ^licenses/?$ licenses/index.php [L]
+    
+    # Progress Routes
+    RewriteRule ^progress/submit/?$ progress/submit.php [L]
+    RewriteRule ^progress/user/?$ progress/user.php [L,QSA]
+    RewriteRule ^progress/categories/?$ progress/categories.php [L,QSA]
+</IfModule>
+
+# Security Headers
+<IfModule mod_headers.c>
+    # Prevent MIME-Sniffing
+    Header set X-Content-Type-Options "nosniff"
+    
+    # XSS Protection
+    Header set X-XSS-Protection "1; mode=block"
+    
+    # Clickjacking Protection
+    Header set X-Frame-Options "SAMEORIGIN"
+    
+    # Referrer Policy
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Disable Directory Listing
+Options -Indexes
+
+# PHP Settings
+<IfModule mod_php.c>
+    php_value upload_max_filesize 5M
+    php_value post_max_size 5M
+    php_value max_execution_time 30
+    php_value max_input_time 30
+</IfModule>
+
+# Error Documents (Optional)
+ErrorDocument 404 /api/error.php?code=404
+ErrorDocument 500 /api/error.php?code=500
