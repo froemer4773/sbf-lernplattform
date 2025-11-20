@@ -2,6 +2,7 @@
 
 .claude
 .vscode
+.angular
 
 # Compiled output
 /dist
