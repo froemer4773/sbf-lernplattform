@@ -112,12 +112,14 @@ export class QuestionViewComponent {
 
     this.apiService.submitAnswer(request).subscribe({
       next: (response) => {
+        console.log('Antwort eingereicht:', response);
         alert(response.message);
         this.nextQuestion();
       },
       error: (err) => {
         console.error('Fehler beim Einreichen der Antwort:', err);
-        alert('Fehler beim Einreichen der Antwort');
+        const errorMsg = err.error?.message || err.message || 'Fehler beim Einreichen der Antwort';
+        alert(`Fehler: ${errorMsg}`);
       }
     });
   }

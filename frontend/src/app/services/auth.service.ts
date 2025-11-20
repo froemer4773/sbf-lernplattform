@@ -21,11 +21,11 @@ export class AuthService {
   }
 
   register(data: RegisterRequest): Observable<any> {
-    return this.http.post(`${this.apiUrl}/auth/register`, data);
+    return this.http.post(`${this.apiUrl}/auth/register/`, data);
   }
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, credentials)
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login/`, credentials)
       .pipe(
         tap((response: AuthResponse) => {
           this.setToken(response.token);

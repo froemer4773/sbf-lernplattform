@@ -57,9 +57,40 @@ export class CategorySelectionComponent {
   loadCategories(license: string) {
     this.loading.set(true);
     this.error.set(null);
-    this.apiService.getCategories(license).subscribe({
-      next: (data) => {
-        this.categories.set(data);
+
+    // Load all questions and extract unique categories from them
+    this.apiService.getQuestions(license).subscribe({
+      next: (questions) => {
+        // Group questions by category and unterkategorie
+        const categoryMap = new Map<string, Set<{name: string, fragen_anzahl: number}>>();
+
+        questions.forEach(q => {
+          if (!categoryMap.has(q.kategorie)) {
+            categoryMap.set(q.kategorie, new Set());
+          }
+          const subCategories = categoryMap.get(q.kategorie)!;
+          subCategories.add({
+            name: q.unterkategorie,
+            fragen_anzahl: 0
+          });
+        });
+
+        // Count questions per subcategory
+        questions.forEach(q => {
+          const subCategories = categoryMap.get(q.kategorie)!;
+          const subCat = Array.from(subCategories).find(s => s.name === q.unterkategorie);
+          if (subCat) {
+            subCat.fragen_anzahl++;
+          }
+        });
+
+        // Convert to Category interface
+        const categories: any[] = Array.from(categoryMap.entries()).map(([kategorie, subCats]) => ({
+          kategorie,
+          unterkategorien: Array.from(subCats)
+        }));
+
+        this.categories.set(categories);
         this.loading.set(false);
       },
       error: (err) => {
