@@ -22,7 +22,7 @@ define('DB_CHARSET', getenv('DB_CHARSET') ?: 'utf8mb4');
 // In production set JWT_SECRET in the environment (Apache/Nginx/FPM) to a strong secret.
 // Example (Apache): SetEnv JWT_SECRET "your-long-secret"
 // Fallback value below should be replaced before production if env not used.
-define('JWT_SECRET', getenv('JWT_SECRET') ?: 'replace-this-with-a-long-random-secret');
+define('JWT_SECRET', getenv('JWT_SECRET') ?: 'Wd$gFr%t^U!*oNHL7geT83S5hz@s&!gl');
 define('JWT_ALGORITHM', getenv('JWT_ALGORITHM') ?: 'HS256');
 define('JWT_EXPIRATION', intval(getenv('JWT_EXPIRATION') ?: 3600 * 24 * 14)); // 14 days
 
