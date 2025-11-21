@@ -7,6 +7,30 @@
 require_once '../../config/config.php';
 require_once '../../middleware/jwt.php';
 
+// ----------------- CORS (Whitelist + Preflight) -----------------
+$allowed_origins = [
+    'https://lern-web.4roemer.de'
+];
+
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+if (in_array($origin, $allowed_origins, true)) {
+    header("Access-Control-Allow-Origin: $origin");
+    // Nur setzen, wenn du mit Credentials (Cookies) arbeitest:
+    header('Access-Control-Allow-Credentials: true');
+}
+
+// Erlaube diese Methoden/Headers für Preflight und Antworten
+//header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+//header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Accept');
+
+// Preflight sofort beantworten (kein Body)
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(204);
+    exit();
+}
+// ---------------------------------------------------------------
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     sendError('Method not allowed', 405);
 }

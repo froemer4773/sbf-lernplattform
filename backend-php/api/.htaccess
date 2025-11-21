@@ -1,0 +1,29 @@
+# api/.htaccess
+# Stellt sicher, dass API-Antworten genau einen Satz CORS-Header erhalten.
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Rewrite: /api/questions/123/image/ -> questions/image.php?id=123
+  RewriteRule ^questions/([0-9]+)/image/?$ questions/image.php?id=$1 [QSA,L]
+
+  # OPTIONS-Preflight kurz beantworten
+  RewriteCond %{REQUEST_METHOD} =OPTIONS
+  RewriteRule ^.*$ - [R=204,L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  # Entferne ALLE bisherigen CORS-Header (falls irgendwo anders gesetzt)
+  Header always unset Access-Control-Allow-Origin
+  Header always unset Access-Control-Allow-Credentials
+  Header always unset Access-Control-Allow-Methods
+  Header always unset Access-Control-Allow-Headers
+  Header always unset Access-Control-Max-Age
+
+  # Setze die gewünschten CORS-Header EINMAL (anpassen falls mehrere Origins nötig)
+  Header always set Access-Control-Allow-Origin "https://lern-web.4roemer.de"
+  Header always set Access-Control-Allow-Credentials "true"
+  Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS, PUT, DELETE"
+  Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With, Accept"
+  Header always set Access-Control-Max-Age "3600"
+</IfModule>
