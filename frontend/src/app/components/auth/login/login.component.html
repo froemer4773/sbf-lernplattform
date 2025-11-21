@@ -28,14 +28,14 @@
           id="password"
           [(ngModel)]="password"
           name="password"
-          placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+          placeholder="Dein Password"
           [disabled]="isLoading"
           required
         />
       </div>
 
       <div class="error-message" *ngIf="errorMessage">
-        âš ï¸ {{ errorMessage }}
+        Error: {{ errorMessage }}
       </div>
 
       <button
