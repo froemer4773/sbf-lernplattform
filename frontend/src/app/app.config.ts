@@ -4,6 +4,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { routes } from './app.routes';
 import { authInterceptor } from './interceptors/auth.interceptor';
+import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -13,5 +14,7 @@ export const appConfig: ApplicationConfig = {
       withInterceptors([authInterceptor])
     ),
     provideAnimationsAsync()
+    ,
+    { provide: LocationStrategy, useClass: HashLocationStrategy }
   ]
 };
