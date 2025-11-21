@@ -1,4 +1,12 @@
 <?php
+//header('Access-Control-Allow-Origin: https://lern-web.4roemer.de');
+//header('Access-Control-Allow-Methods: GET, OPTIONS');
+//header('Access-Control-Allow-Headers: Authorization, Content-Type');
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(204);
+    exit;
+}
 /**
  * Question Image Endpoint - Angepasst für BLOB Bilder
  * GET /api/questions/image.php?id=123
