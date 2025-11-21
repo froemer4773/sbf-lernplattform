@@ -42,6 +42,6 @@ export class DashboardComponent implements OnInit {
   }
 
   viewStatistics(): void {
-    this.router.navigate(['/statistics']);
+    this.router.navigate(['/statistics/learning-time']);
   }
 }
