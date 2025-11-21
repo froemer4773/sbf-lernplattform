@@ -1,5 +1,6 @@
 import { Component, OnInit, signal, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 
@@ -26,7 +27,7 @@ interface LearningTimeResponse {
 
 @Component({
   selector: 'app-learning-time',
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './learning-time.component.html',
   styleUrl: './learning-time.component.scss'
 })
