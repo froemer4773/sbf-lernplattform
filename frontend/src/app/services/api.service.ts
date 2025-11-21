@@ -73,4 +73,9 @@ export class ApiService {
     if (schein) params = params.set('schein', schein);
     return this.http.get<CategoryProgress[]>(`${this.apiUrl}/progress/categories/`, { params });
   }
+
+  getLearningTimeStats(period: 'day' | 'week' | 'month'): Observable<any> {
+    let params = new HttpParams().set('period', period);
+    return this.http.get<any>(`${this.apiUrl}/progress/learning-time/`, { params });
+  }
 }

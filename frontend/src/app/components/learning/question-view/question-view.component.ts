@@ -18,6 +18,7 @@ export class QuestionViewComponent {
   private questionStart = Date.now();
   private totalSessionSeconds = 0;
   private sessionId: number | string | null = null;
+  private answeredCount = 0;
 
   questions = signal<Question[]>([]);
   currentQuestionIndex = signal<number>(0);
@@ -81,44 +82,32 @@ export class QuestionViewComponent {
 
   onBack(event: Event) {
     event.preventDefault();
-    const navigateBack = () => {
+    this.endSessionAndNavigate('/learning/category-selection');
+  }
+
+  private endSessionAndNavigate(route: string) {
+    const navigate = () => {
       try {
-        this.router.navigate(['/learning/category-selection']);
+        this.router.navigate([route]);
       } catch (e) {
-        // ignore
+        console.warn('Navigation failed:', e);
       }
     };
 
-    try {
-      if (this.totalSessionSeconds > 0) {
-        if (this.sessionId != null) {
-          this.apiService.endSession(this.sessionId, this.totalSessionSeconds).subscribe({
-            next: () => {
-              console.log('Session ended via back:', this.sessionId, this.totalSessionSeconds);
-              navigateBack();
-            },
-            error: (err) => {
-              console.warn('Session end failed via back:', err);
-              navigateBack();
-            }
-          });
-        } else {
-          this.apiService.endSession(null, this.totalSessionSeconds).subscribe({
-            next: () => {
-              console.log('Session logged via back:', this.totalSessionSeconds);
-              navigateBack();
-            },
-            error: (err) => {
-              console.warn('Session logging failed via back:', err);
-              navigateBack();
-            }
-          });
+    if (this.totalSessionSeconds > 0 && this.sessionId != null) {
+      this.apiService.endSession(this.sessionId, this.totalSessionSeconds).subscribe({
+        next: () => {
+          console.log('Session ended successfully:', this.sessionId, this.totalSessionSeconds);
+          navigate();
+        },
+        error: (err) => {
+          console.warn('Session end failed:', err);
+          navigate();
         }
-      } else {
-        navigateBack();
-      }
-    } catch (e) {
-      navigateBack();
+      });
+    } else {
+      if (!this.sessionId) console.warn('No session_id to end');
+      navigate();
     }
   }
 
@@ -133,6 +122,8 @@ export class QuestionViewComponent {
         this.sessionStart = Date.now();
         this.questionStart = Date.now();
         this.totalSessionSeconds = 0;
+        this.answeredCount = 0;
+        this.sessionId = null;
 
         // Try to create a session record on the backend (best-effort).
         // Expecting backend to accept POST /progress/session/ { action: 'start' } -> { session_id }
@@ -243,7 +234,17 @@ export class QuestionViewComponent {
         alert(response.message);
         // accumulate session seconds and move to next
         this.totalSessionSeconds += timeTakenSeconds;
-        this.nextQuestion();
+        this.answeredCount++;
+
+        const totalQuestions = this.questions().length;
+        const allAnswered = this.answeredCount >= totalQuestions;
+
+        if (allAnswered) {
+          console.log('All questions answered. Ending session.');
+          this.endSessionAndNavigate('/learning/category-selection');
+        } else {
+          this.nextQuestion();
+        }
       },
       error: (err) => {
         console.error('Fehler beim Einreichen der Antwort:', err);

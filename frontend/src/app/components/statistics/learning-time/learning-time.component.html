@@ -1,0 +1,106 @@
+<div class="learning-time-container">
+  <div class="header">
+    <h1>Lernzeit-Statistik</h1>
+    <p class="subtitle">Übersicht Ihrer Lernzeiten</p>
+  </div>
+
+  <!-- Period Selector -->
+  <div class="period-selector">
+    <button
+      [class.active]="selectedPeriod() === 'day'"
+      (click)="changePeriod('day')"
+      class="period-btn">
+      Letzte 7 Tage
+    </button>
+    <button
+      [class.active]="selectedPeriod() === 'week'"
+      (click)="changePeriod('week')"
+      class="period-btn">
+      Letzte 12 Wochen
+    </button>
+    <button
+      [class.active]="selectedPeriod() === 'month'"
+      (click)="changePeriod('month')"
+      class="period-btn">
+      Letzte 12 Monate
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading">
+      <p>Lade Statistiken...</p>
+    </div>
+  }
+
+  @if (error(); as errorMsg) {
+    <div class="error-message">
+      {{ errorMsg }}
+      <button (click)="loadData()">Erneut versuchen</button>
+    </div>
+  }
+
+  @if (!loading() && !error()) {
+    <!-- Summary Cards -->
+    @if (summary(); as sum) {
+      <div class="summary-cards">
+        <div class="summary-card">
+          <div class="card-label">Gesamtzeit</div>
+          <div class="card-value">{{ sum.total_hours }} h</div>
+          <div class="card-detail">{{ sum.total_minutes }} Minuten</div>
+        </div>
+        <div class="summary-card">
+          <div class="card-label">Lernsitzungen</div>
+          <div class="card-value">{{ sum.total_sessions }}</div>
+          <div class="card-detail">{{ getPeriodLabel() }}</div>
+        </div>
+        <div class="summary-card">
+          <div class="card-label">Durchschnitt/Sitzung</div>
+          <div class="card-value">
+            {{ sum.total_sessions > 0 ? (sum.total_minutes / sum.total_sessions).toFixed(1) : 0 }} min
+          </div>
+          <div class="card-detail">pro Session</div>
+        </div>
+      </div>
+    }
+
+    <!-- Chart -->
+    <div class="chart-section">
+      <h2>{{ getPeriodLabel() }}</h2>
+      <div class="chart-container">
+        <canvas #chartCanvas></canvas>
+      </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="table-section">
+      <h2>Detailansicht</h2>
+      @if (data().length > 0) {
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Zeitraum</th>
+              <th>Sitzungen</th>
+              <th>Zeit (Minuten)</th>
+              <th>Zeit (Stunden)</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of data(); track row.period) {
+              <tr>
+                <td>{{ formatPeriodLabel(row.period) }}</td>
+                <td>{{ row.session_count }}</td>
+                <td>{{ row.total_minutes }}</td>
+                <td>{{ row.total_hours }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else {
+        <div class="no-data">
+          <p>Keine Daten für diesen Zeitraum vorhanden.</p>
+          <p class="hint">Starten Sie eine Lernrunde, um Ihre Lernzeit zu erfassen.</p>
+        </div>
+      }
+    </div>
+  }
+</div>
