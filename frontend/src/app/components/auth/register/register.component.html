@@ -1,1 +1,66 @@
-<p>register works!</p>
+<div class="login-container">
+	<div class="login-card">
+		<div class="logo-section">
+			<h1>SBF-Lernplattform</h1>
+			<p>Deine kostenlose Prüfungsvorbereitung</p>
+		</div>
+
+		<form (ngSubmit)="onSubmit()" class="login-form">
+			<h2>Registrieren</h2>
+
+			<div class="form-group">
+				<label for="vorname">Vorname</label>
+				<input id="vorname" name="vorname" [(ngModel)]="vorname" [disabled]="isLoading" placeholder="Vorname" required />
+			</div>
+
+			<div class="form-group">
+				<label for="nachname">Nachname</label>
+				<input id="nachname" name="nachname" [(ngModel)]="nachname" [disabled]="isLoading" placeholder="Nachname" required />
+			</div>
+
+			<div class="form-group">
+				<label for="email">E-Mail</label>
+				<input type="email" id="email" name="email" [(ngModel)]="email" [disabled]="isLoading" placeholder="deine@email.de" required />
+			</div>
+
+			<div class="form-group">
+				<label for="password">Passwort</label>
+				<input type="password" id="password" name="password" [(ngModel)]="password" [disabled]="isLoading" placeholder="Passwort" required />
+				<div class="field-error" *ngIf="passwordError">{{ passwordError }}</div>
+
+				<ul class="pw-rules">
+					<li [class.ok]="passwordHasUpper">Mindestens ein Großbuchstabe</li>
+					<li [class.ok]="passwordHasLower">Mindestens ein Kleinbuchstabe</li>
+					<li [class.ok]="passwordHasDigit">Mindestens eine Zahl</li>
+				</ul>
+			</div>
+
+			<div class="form-group">
+				<label for="confirmPassword">Passwort wiederholen</label>
+				<input type="password" id="confirmPassword" name="confirmPassword" [(ngModel)]="confirmPassword" [disabled]="isLoading" placeholder="Passwort wiederholen" required />
+				<div class="field-error" *ngIf="confirmPasswordError">{{ confirmPasswordError }}</div>
+			</div>
+
+			<div class="form-group" *ngIf="licenses.length">
+				<label for="preferred">Schein (optional)</label>
+				<select id="preferred" name="preferred" [(ngModel)]="preferredSchein" [disabled]="isLoading">
+					<option *ngFor="let l of licenses" [value]="l">{{ l }}</option>
+				</select>
+			</div>
+
+			<div class="error-message" *ngIf="errorMessage">
+				Error: {{ errorMessage }}
+			</div>
+
+			<button type="submit" class="btn-primary" [disabled]="isLoading">
+				<span *ngIf="!isLoading">Registrieren</span>
+				<span *ngIf="isLoading">Wird geladen...</span>
+			</button>
+
+			<div class="register-link">
+				Bereits registriert?
+				<a (click)="goToLogin()">Zur Anmeldung</a>
+			</div>
+		</form>
+	</div>
+</div>

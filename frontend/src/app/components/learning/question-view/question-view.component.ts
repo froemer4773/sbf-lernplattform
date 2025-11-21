@@ -1,17 +1,24 @@
-import { Component, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, signal, computed, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
+import { AuthService } from '../../../services/auth.service';
 import { Question, SubmitAnswerRequest } from '../../../models/models';
 
 @Component({
   selector: 'app-question-view',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './question-view.component.html',
   styleUrl: './question-view.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class QuestionViewComponent {
+  // Session / timing
+  private sessionStart = Date.now();
+  private questionStart = Date.now();
+  private totalSessionSeconds = 0;
+  private sessionId: number | string | null = null;
+
   questions = signal<Question[]>([]);
   currentQuestionIndex = signal<number>(0);
   selectedAnswers = signal<Map<number, string>>(new Map());
@@ -34,6 +41,7 @@ export class QuestionViewComponent {
 
   constructor(
     public apiService: ApiService,
+    private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router
   ) {
@@ -48,6 +56,72 @@ export class QuestionViewComponent {
     });
   }
 
+  // Ensure we send session data on destroy (best-effort)
+  ngOnDestroy(): void {
+    try {
+      if (this.totalSessionSeconds > 0) {
+        // If backend supports explicit session lifecycle, use it
+        if (this.sessionId != null) {
+          this.apiService.endSession(this.sessionId, this.totalSessionSeconds).subscribe({
+            next: () => console.log('Session ended:', this.sessionId, this.totalSessionSeconds),
+            error: (err) => console.warn('Session end failed (may be unsupported):', err)
+          });
+        } else {
+          // Fallback: attempt to post a generic session end (server may accept without id)
+          this.apiService.endSession(null, this.totalSessionSeconds).subscribe({
+            next: () => console.log('Session logged (no id):', this.totalSessionSeconds),
+            error: (err) => console.warn('Session logging failed (may be unsupported):', err)
+          });
+        }
+      }
+    } catch (e) {
+      // ignore any errors
+    }
+  }
+
+  onBack(event: Event) {
+    event.preventDefault();
+    const navigateBack = () => {
+      try {
+        this.router.navigate(['/learning/category-selection']);
+      } catch (e) {
+        // ignore
+      }
+    };
+
+    try {
+      if (this.totalSessionSeconds > 0) {
+        if (this.sessionId != null) {
+          this.apiService.endSession(this.sessionId, this.totalSessionSeconds).subscribe({
+            next: () => {
+              console.log('Session ended via back:', this.sessionId, this.totalSessionSeconds);
+              navigateBack();
+            },
+            error: (err) => {
+              console.warn('Session end failed via back:', err);
+              navigateBack();
+            }
+          });
+        } else {
+          this.apiService.endSession(null, this.totalSessionSeconds).subscribe({
+            next: () => {
+              console.log('Session logged via back:', this.totalSessionSeconds);
+              navigateBack();
+            },
+            error: (err) => {
+              console.warn('Session logging failed via back:', err);
+              navigateBack();
+            }
+          });
+        }
+      } else {
+        navigateBack();
+      }
+    } catch (e) {
+      navigateBack();
+    }
+  }
+
   loadQuestions(schein: string, kategorie: string) {
     this.loading.set(true);
     this.error.set(null);
@@ -55,6 +129,38 @@ export class QuestionViewComponent {
       next: (data) => {
         this.questions.set(data);
         this.currentQuestionIndex.set(0);
+        // initialize session timers
+        this.sessionStart = Date.now();
+        this.questionStart = Date.now();
+        this.totalSessionSeconds = 0;
+
+        // Try to create a session record on the backend (best-effort).
+        // Expecting backend to accept POST /progress/session/ { action: 'start' } -> { session_id }
+        const currentUser = this.authService.getCurrentUser();
+        const payload: any = {
+          user_id: currentUser ? currentUser.id : null,
+          session_type: 'kategorie',
+          schein_filter: this.schein(),
+          kategorie_filter: this.kategorie()
+        };
+
+        this.apiService.createSession(payload).subscribe({
+          next: (resp) => {
+            try {
+              if (resp && (resp.session_id || resp.sessionId || resp.id)) {
+                this.sessionId = resp.session_id || resp.sessionId || resp.id;
+                console.log('Session started, id=', this.sessionId);
+              } else {
+                console.log('Session create response (no id):', resp);
+              }
+            } catch (e) {
+              console.warn('Unable to parse session create response:', resp);
+            }
+          },
+          error: (err) => {
+            console.warn('Session create failed (may be unsupported):', err);
+          }
+        });
         this.loading.set(false);
       },
       error: (err) => {
@@ -78,6 +184,8 @@ export class QuestionViewComponent {
     const index = this.currentQuestionIndex();
     if (index < this.questions().length - 1) {
       this.currentQuestionIndex.set(index + 1);
+      // reset question timer for the new question
+      this.questionStart = Date.now();
     }
   }
 
@@ -85,12 +193,16 @@ export class QuestionViewComponent {
     const index = this.currentQuestionIndex();
     if (index > 0) {
       this.currentQuestionIndex.set(index - 1);
+      // reset question timer when navigating
+      this.questionStart = Date.now();
     }
   }
 
   goToQuestion(index: number) {
     if (index >= 0 && index < this.questions().length) {
       this.currentQuestionIndex.set(index);
+      // reset question timer when jumping
+      this.questionStart = Date.now();
     }
   }
 
@@ -104,16 +216,33 @@ export class QuestionViewComponent {
     }
 
     const selectedAnswer = selectedAnswers.get(question.frage_id);
+    const now = Date.now();
+    let timeTakenSeconds = Math.round((now - this.questionStart) / 1000);
+    if (timeTakenSeconds <= 0) timeTakenSeconds = 1;
+
     const request: SubmitAnswerRequest = {
       frage_id: question.frage_id,
       selected_answer: selectedAnswer!,
-      time_taken_seconds: 0
+      time_taken_seconds: timeTakenSeconds
     };
+
+    const token = this.authService.getToken();
+    console.log('Submitting answer; auth token present?', !!token);
+    // for debugging: print a short prefix (don't leak full token in logs long-term)
+    if (token) console.log('Token prefix:', token.substring(0, 12) + '...');
+
+    if (!token) {
+      alert('Nicht angemeldet. Bitte einloggen.');
+      this.router.navigate(['/login']);
+      return;
+    }
 
     this.apiService.submitAnswer(request).subscribe({
       next: (response) => {
         console.log('Antwort eingereicht:', response);
         alert(response.message);
+        // accumulate session seconds and move to next
+        this.totalSessionSeconds += timeTakenSeconds;
         this.nextQuestion();
       },
       error: (err) => {

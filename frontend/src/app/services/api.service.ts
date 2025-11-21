@@ -48,6 +48,20 @@ export class ApiService {
     return this.http.post<SubmitAnswerResponse>(`${this.apiUrl}/progress/submit/`, data);
   }
 
+  // Optional: log overall learning session duration (seconds). Backend may accept
+  // Session API helpers (best-effort): start and end a learning session.
+  // POST /progress/session/ with { action: 'start', user_id, ... } -> returns { session_id }
+  createSession(payload?: any) {
+    const body = Object.assign({ action: 'start' }, payload || {});
+    return this.http.post<any>(`${this.apiUrl}/progress/session/`, body);
+  }
+
+  // End session: POST /progress/session/ with { action: 'end', session_id, duration_seconds }
+  endSession(sessionId: number | string | null, durationSeconds: number, payload?: any) {
+    const body = Object.assign({ action: 'end', session_id: sessionId, duration_seconds: durationSeconds }, payload || {});
+    return this.http.post<any>(`${this.apiUrl}/progress/session/`, body);
+  }
+
   getUserProgress(schein?: string): Observable<Progress> {
     let params = new HttpParams();
     if (schein) params = params.set('schein', schein);

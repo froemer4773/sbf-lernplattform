@@ -1,6 +1,6 @@
 <div class="question-view-container">
   <div class="header">
-    <a [routerLink]="['/learning/category-selection']" class="back-link">← Zurück</a>
+    <a href="#" (click)="onBack($event)" class="back-link">← Zurück</a>
     <h1>{{ schein() }} - {{ kategorie() }}</h1>
   </div>
 
@@ -97,7 +97,7 @@
       } @else {
         <div class="no-questions">
           <p>Keine Fragen verfügbar</p>
-          <a [routerLink]="['/learning/category-selection']" class="btn btn-primary">
+          <a href="#" (click)="onBack($event)" class="btn btn-primary">
             Zurück zur Kategorie-Auswahl
           </a>
         </div>
