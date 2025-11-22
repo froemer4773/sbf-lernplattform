@@ -145,14 +145,6 @@
             height: 20px;
           }
 
-          .answer-letter {
-            display: inline-block;
-            min-width: 30px;
-            font-weight: bold;
-            color: #007bff;
-            margin-right: 1rem;
-          }
-
           .answer-text {
             flex: 1;
             color: #333;
@@ -240,6 +232,19 @@
             border-color: #28a745;
             color: #28a745;
             font-weight: bold;
+          }
+
+          &.incorrect {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #dc3545;
+            font-weight: bold;
+          }
+
+          &.current.incorrect {
+            background-color: #dc3545;
+            color: white;
+            border-color: #dc3545;
           }
         }
       }

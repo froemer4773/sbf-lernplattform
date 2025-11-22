@@ -23,6 +23,8 @@ export class QuestionViewComponent {
   questions = signal<Question[]>([]);
   currentQuestionIndex = signal<number>(0);
   selectedAnswers = signal<Map<number, string>>(new Map());
+  incorrectAnswers = signal<Set<number>>(new Set());
+  shuffledAnswers = signal<Map<number, any[]>>(new Map());
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
   schein = signal<string>('');
@@ -33,6 +35,12 @@ export class QuestionViewComponent {
     const questions = this.questions();
     const index = this.currentQuestionIndex();
     return index >= 0 && index < questions.length ? questions[index] : null;
+  });
+
+  currentShuffledAnswers = computed(() => {
+    const question = this.currentQuestion();
+    if (!question) return [];
+    return this.shuffledAnswers().get(question.frage_id) || [];
   });
 
   progress = computed(() => {
@@ -131,6 +139,16 @@ export class QuestionViewComponent {
 
         this.questions.set(filteredQuestions);
         this.currentQuestionIndex.set(0);
+
+        // Shuffle answers for each question
+        const shuffledMap = new Map<number, any[]>();
+        filteredQuestions.forEach(q => {
+          if (q.antworten && q.antworten.length > 0) {
+            shuffledMap.set(q.frage_id, this.shuffleArray(q.antworten));
+          }
+        });
+        this.shuffledAnswers.set(shuffledMap);
+
         // initialize session timers
         this.sessionStart = Date.now();
         this.questionStart = Date.now();
@@ -244,7 +262,19 @@ export class QuestionViewComponent {
     this.apiService.submitAnswer(request).subscribe({
       next: (response) => {
         console.log('Antwort eingereicht:', response);
-        alert(response.message);
+
+        // Track if answer was incorrect
+        if (response.is_correct === false && question) {
+          const newIncorrect = new Set(this.incorrectAnswers());
+          newIncorrect.add(question.frage_id);
+          this.incorrectAnswers.set(newIncorrect);
+        } else if (response.is_correct === true && question) {
+          // Remove from incorrect if it was there and now correct
+          const newIncorrect = new Set(this.incorrectAnswers());
+          newIncorrect.delete(question.frage_id);
+          this.incorrectAnswers.set(newIncorrect);
+        }
+
         // accumulate session seconds and move to next
         this.totalSessionSeconds += timeTakenSeconds;
         this.answeredCount++;
@@ -278,5 +308,18 @@ export class QuestionViewComponent {
       return 'selected';
     }
     return '';
+  }
+
+  isIncorrectAnswer(questionId: number): boolean {
+    return this.incorrectAnswers().has(questionId);
+  }
+
+  private shuffleArray<T>(array: T[]): T[] {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
   }
 }

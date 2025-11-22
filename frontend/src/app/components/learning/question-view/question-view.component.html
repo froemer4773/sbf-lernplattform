@@ -41,7 +41,7 @@
 
           <!-- Answers -->
           <div class="answers-section">
-            @for (answer of question.antworten; track answer.buchstabe) {
+            @for (answer of currentShuffledAnswers(); track answer.buchstabe) {
               <label class="answer-option" [class.selected]="getAnswerStatus(answer.buchstabe) === 'selected'">
                 <input
                   type="radio"
@@ -50,7 +50,6 @@
                   (change)="selectAnswer(answer.buchstabe)"
                   name="answer"
                 />
-                <span class="answer-letter">{{ answer.buchstabe }}</span>
                 <span class="answer-text">{{ answer.text }}</span>
               </label>
             }
@@ -86,6 +85,7 @@
               <button
                 [class.current]="i === currentQuestionIndex()"
                 [class.answered]="selectedAnswers().has(question.frage_id)"
+                [class.incorrect]="isIncorrectAnswer(question.frage_id)"
                 (click)="goToQuestion(i)"
                 class="nav-button"
               >
