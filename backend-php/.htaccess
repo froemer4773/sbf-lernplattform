@@ -1,0 +1,58 @@
+# Web-Root .htaccess
+# - SPA fallback: non-file requests -> /index.html
+# - /api/* passt durch (wird in api/.htaccess behandelt)
+# - php-fallback (.php) bleibt erhalten
+# - OPTIONS kurz beantworten
+# - CORS-Header für non-API requests (API hat eigene .htaccess)
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Wenn die Datei/Dir existiert, normal weitermachen
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Wenn die URL mit /api/ beginnt: NICHT rewrite (API wird separat behandelt)
+  RewriteRule ^api/ - [L]
+
+  # Wenn eine Anfrage ohne .php kommt und die entsprechende .php-Datei existiert, leite auf .php
+  RewriteCond %{REQUEST_FILENAME}.php -f
+  RewriteRule ^(.*)$ $1.php [L]
+
+  # OPTIONS-Preflight mit 204 beantworten (Kurzantwort)
+  RewriteCond %{REQUEST_METHOD} =OPTIONS
+  RewriteRule ^(.*)$ - [R=204,L]
+
+  # SPA-Fallback: alle anderen Requests an index.html
+  # (Angular Router übernimmt dann die clientseitige Route)
+  RewriteRule ^ /index.html [L]
+</IfModule>
+
+# Markiere API-Anfragen, damit wir CORS-Header für diese Pfade nicht hier setzen
+SetEnvIf Request_URI "^/api/" IS_API
+
+<IfModule mod_headers.c>
+  # Erlaube nur konkrete Frontend-Origin (nicht "*")
+  SetEnvIf Origin "^https://lern-web\.4roemer\.de$" CORS_ALLOWED=$0
+
+  # Entferne CORS-Header für API-Pfade (api/.htaccess setzt die API-CORS)
+  Header unset Access-Control-Allow-Origin env=IS_API
+  Header unset Access-Control-Allow-Credentials env=IS_API
+  Header unset Access-Control-Allow-Methods env=IS_API
+  Header unset Access-Control-Allow-Headers env=IS_API
+
+  # Setze CORS-Header für Nicht-API (falls benötigt)
+  Header always set Access-Control-Allow-Origin "%{CORS_ALLOWED}e" env=CORS_ALLOWED
+  Header always set Access-Control-Allow-Credentials "true" env=CORS_ALLOWED
+  Header always set Access-Control-Allow-Methods "GET,POST,OPTIONS,PUT,DELETE" env=CORS_ALLOWED
+  Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With, Accept" env=CORS_ALLOWED
+</IfModule>
+
+# Sicherheitskleinigkeiten
+<FilesMatch "\.(env|ini|phar|sql|sh|bak)$">
+  Require all denied
+</FilesMatch>
+
+# Optional: Verzeichnisliste verhindern
+Options -Indexes

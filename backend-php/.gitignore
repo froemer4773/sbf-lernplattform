@@ -4,8 +4,7 @@
 .vscode
 .angular
 .github
-*.ps1
-
+/*.ps1
 # Compiled output
 /dist
 /tmp
@@ -47,3 +46,4 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+config.php
