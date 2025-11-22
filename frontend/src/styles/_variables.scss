@@ -1,0 +1,189 @@
+// ============================================
+// SBF Lernplattform - Design System
+// ============================================
+
+// --------------------------------------------
+// 1. Color Palette - Dark Professional Theme
+// --------------------------------------------
+// Main background colors
+$bg-primary: #1a1a1a;           // Haupthintergrund
+$bg-secondary: #2d2d2d;         // Sekundärer Hintergrund
+$bg-tertiary: #3a3a3a;          // Sidebar, Cards
+$bg-card: #2a2a2a;              // Card Background
+$bg-hover: #333333;             // Hover States
+$bg-active: #404040;            // Active States
+
+// Accent colors
+$accent-primary: #00bcd4;       // Cyan - Hauptakzent (wie im Screenshot)
+$accent-primary-hover: #00acc1;
+$accent-primary-light: rgba(0, 188, 212, 0.1);
+
+$accent-secondary: #ffa726;     // Orange - Sekundärakzent
+$accent-yellow: #ffd54f;        // Gelb - für Highlights
+
+// Semantic colors
+$success-color: #66bb6a;        // Grün
+$success-light: #81c784;
+$success-dark: #4caf50;
+
+$error-color: #ef5350;          // Rot
+$error-light: #e57373;
+$error-dark: #f44336;
+
+$warning-color: #ffa726;        // Orange
+$info-color: #29b6f6;           // Hellblau
+
+// Text colors
+$text-primary: #ffffff;         // Haupttext
+$text-secondary: #b0b0b0;       // Sekundärtext
+$text-tertiary: #808080;        // Tertiärtext
+$text-disabled: #606060;        // Deaktiviert
+$text-muted: #707070;           // Gedämpft
+
+// Border colors
+$border-color: #404040;
+$border-light: #4a4a4a;
+$border-dark: #2a2a2a;
+$divider-color: #333333;
+
+// --------------------------------------------
+// 2. Typography
+// --------------------------------------------
+$font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                   'Helvetica Neue', Arial, sans-serif;
+$font-family-headings: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+
+$font-size-base: 15px;
+$font-size-small: 13px;
+$font-size-large: 17px;
+$font-size-xlarge: 20px;
+
+$font-size-h1: 2rem;      // 32px
+$font-size-h2: 1.5rem;    // 24px
+$font-size-h3: 1.25rem;   // 20px
+$font-size-h4: 1.125rem;  // 18px
+
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+$line-height-base: 1.5;
+$line-height-headings: 1.3;
+$line-height-relaxed: 1.7;
+
+// --------------------------------------------
+// 3. Spacing
+// --------------------------------------------
+$spacing-xs: 0.25rem;   // 4px
+$spacing-sm: 0.5rem;    // 8px
+$spacing-md: 0.75rem;   // 12px
+$spacing-lg: 1rem;      // 16px
+$spacing-xl: 1.5rem;    // 24px
+$spacing-xxl: 2rem;     // 32px
+$spacing-xxxl: 3rem;    // 48px
+
+// --------------------------------------------
+// 4. Layout
+// --------------------------------------------
+$container-max-width: 1400px;
+$content-max-width: 1000px;
+$card-max-width: 600px;
+$sidebar-width: 280px;
+
+$border-radius-sm: 4px;
+$border-radius-md: 6px;
+$border-radius-lg: 8px;
+$border-radius-xl: 12px;
+
+$header-height: 60px;
+$footer-height: 50px;
+
+// --------------------------------------------
+// 5. Shadows
+// --------------------------------------------
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+$shadow-md: 0 2px 8px rgba(0, 0, 0, 0.4);
+$shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.5);
+$shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.6);
+$shadow-inset: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+
+// --------------------------------------------
+// 6. Transitions
+// --------------------------------------------
+$transition-fast: 0.15s ease;
+$transition-normal: 0.3s ease;
+$transition-slow: 0.5s ease;
+
+// --------------------------------------------
+// 7. Z-Index Layers
+// --------------------------------------------
+$z-index-dropdown: 1000;
+$z-index-sticky: 1020;
+$z-index-fixed: 1030;
+$z-index-modal-backdrop: 1040;
+$z-index-modal: 1050;
+$z-index-popover: 1060;
+$z-index-tooltip: 1070;
+
+// --------------------------------------------
+// 8. Breakpoints
+// --------------------------------------------
+$breakpoint-xs: 0;
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+$breakpoint-xxl: 1400px;
+
+// --------------------------------------------
+// 9. Component Specific
+// --------------------------------------------
+
+// Buttons
+$btn-padding-y: 0.625rem;
+$btn-padding-x: 1.25rem;
+$btn-font-size: $font-size-base;
+$btn-border-radius: $border-radius-md;
+$btn-transition: all $transition-normal;
+
+// Cards
+$card-padding: $spacing-xl;
+$card-border-radius: $border-radius-lg;
+$card-background: $bg-card;
+$card-shadow: $shadow-md;
+$card-border: 1px solid $border-color;
+
+// Inputs
+$input-padding-y: 0.625rem;
+$input-padding-x: 0.875rem;
+$input-border-radius: $border-radius-md;
+$input-border-color: $border-color;
+$input-background: $bg-tertiary;
+$input-focus-border-color: $accent-primary;
+$input-focus-shadow: 0 0 0 3px $accent-primary-light;
+
+// Radio Buttons
+$radio-size: 20px;
+$radio-border: 2px solid $border-color;
+$radio-checked-bg: $accent-primary;
+
+// Navigation
+$nav-item-padding: 0.75rem 1rem;
+$nav-item-hover-bg: $bg-hover;
+$nav-item-active-bg: $bg-active;
+$nav-icon-size: 20px;
+
+// Back Link
+$back-link-position-top: 1rem;
+$back-link-position-left: 1rem;
+$back-link-color: $accent-primary;
+$back-link-hover-color: lighten($accent-primary, 10%);
+
+// Legacy support (für Kompatibilität mit bestehenden Mixins)
+$surface-color: $bg-card;
+$primary-color: $accent-primary;  // loading-spinner mixin
+$primary-light: $accent-primary-hover;
+$primary-dark: darken($accent-primary, 10%);
+$secondary-color: $accent-secondary;

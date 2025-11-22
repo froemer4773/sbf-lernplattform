@@ -1,9 +1,4 @@
 <div class="question-view-container">
-  <div class="header">
-    <a href="#" (click)="onBack($event)" class="back-link">← Zurück</a>
-    <h1>{{ schein() }} - {{ kategorie() }}</h1>
-  </div>
-
   @if (error(); as errorMsg) {
     <div class="error-message">
       {{ errorMsg }}
@@ -17,82 +12,95 @@
     </div>
   } @else {
     <div class="content">
-      <!-- Progress Bar -->
-      <div class="progress-section">
-        <div class="progress-info">
-          <span>Frage {{ progress().current }} von {{ progress().total }}</span>
-        </div>
-        <div class="progress-bar">
-          <div class="progress-fill" [style.width.%]="progress().percentage"></div>
-        </div>
-      </div>
-
-      <!-- Question -->
+      <!-- Question Card wie im Screenshot -->
       @if (currentQuestion(); as question) {
         <div class="question-card">
-          <div class="question-header">
-            <h2>{{ question.frage_text }}</h2>
-            @if (question.has_image) {
-              <div class="question-image">
-                <img [src]="apiService.getQuestionImageUrl(question.frage_id)" alt="Frage Bild" />
-              </div>
-            }
+          <!-- Card Header mit Kategorie und Frage-Nummer -->
+          <div class="card-header">
+            <div class="category-badge">
+              <span class="icon">💬</span>
+              <span class="text">{{ schein() }} {{ kategorie() }}</span>
+            </div>
+            <div class="question-number">Frage {{ progress().current }} von {{ progress().total }}</div>
           </div>
 
-          <!-- Answers -->
+          <!-- Frage Text -->
+          <h2 class="question-title">{{ question.frage_text }}</h2>
+
+          <!-- Frage Bild (falls vorhanden) -->
+          @if (question.has_image) {
+            <div class="question-image">
+              <img [src]="apiService.getQuestionImageUrl(question.frage_id)" alt="Frage Bild" />
+            </div>
+          }
+
+          <!-- Antwort-Optionen mit Radio Buttons -->
           <div class="answers-section">
             @for (answer of currentShuffledAnswers(); track answer.buchstabe) {
-              <label class="answer-option" [class.selected]="getAnswerStatus(answer.buchstabe) === 'selected'">
+              <label class="answer-option"
+                [class.selected]="getAnswerStatus(answer.buchstabe) === 'selected'"
+                [class.correct]="revealed() && answer.ist_korrekt === 1"
+                [class.incorrect]="revealed() && answer.ist_korrekt !== 1 && getAnswerStatus(answer.buchstabe) === 'selected'">
                 <input
                   type="radio"
                   [value]="answer.buchstabe"
                   [checked]="getAnswerStatus(answer.buchstabe) === 'selected'"
                   (change)="selectAnswer(answer.buchstabe)"
                   name="answer"
+                  [disabled]="revealed()"
                 />
                 <span class="answer-text">{{ answer.text }}</span>
               </label>
             }
-          </div>
-
-          <!-- Action Buttons -->
-          <div class="actions">
-            <button
-              [disabled]="currentQuestionIndex() === 0"
-              (click)="previousQuestion()"
-              class="btn btn-secondary"
-            >
-              ← Vorherige
-            </button>
-            <button (click)="submitAnswer()" class="btn btn-primary">
-              Antwort einreichen
-            </button>
-            <button
-              [disabled]="currentQuestionIndex() === questions().length - 1"
-              (click)="nextQuestion()"
-              class="btn btn-secondary"
-            >
-              Nächste →
+          </div>          <!-- Hinweis Button (wie im Screenshot) -->
+          <div class="hint-section">
+            <button class="hint-button" (click)="toggleHint()">
+              <span class="icon">ℹ️</span>
+              HINWEIS ANZEIGEN
+              <span class="arrow">▼</span>
             </button>
           </div>
         </div>
 
-        <!-- Question Navigator -->
-        <div class="navigator-section">
-          <h3>Fragen Navigation</h3>
-          <div class="question-navigator">
-            @for (question of questions(); track question.frage_id; let i = $index) {
-              <button
-                [class.current]="i === currentQuestionIndex()"
-                [class.answered]="selectedAnswers().has(question.frage_id)"
-                [class.incorrect]="isIncorrectAnswer(question.frage_id)"
-                (click)="goToQuestion(i)"
-                class="nav-button"
-              >
-                {{ i + 1 }}
-              </button>
-            }
-          </div>
+        <!-- Navigation Buttons unten (wie im Screenshot) -->
+        <div class="bottom-navigation">
+          <button
+            [disabled]="currentQuestionIndex() === 0"
+            (click)="previousQuestion()"
+            class="nav-btn prev-btn"
+          >
+            <span class="arrow">←</span> VORHERIGE
+          </button>
+          <button
+            (click)="onBack($event)"
+            class="nav-btn back-btn"
+          >
+            ✕ BEENDEN
+          </button>
+          <button
+            (click)="revealAnswer()"
+            class="nav-btn reveal-btn"
+            [disabled]="revealed()"
+          >
+            ✓ AUFDECKEN
+          </button>
+          @if (answerResults().length === questions().length && answerResults().length > 0) {
+            <!-- Alle Fragen beantwortet: Zeige Ergebnisse-Button -->
+            <button
+              (click)="showResults()"
+              class="nav-btn next-btn results-btn"
+            >
+              ERGEBNISSE ANZEIGEN <span class="arrow">→</span>
+            </button>
+          } @else {
+            <!-- Noch nicht alle beantwortet: Zeige WEITER (submits answer) -->
+            <button
+              (click)="submitAnswer()"
+              class="nav-btn next-btn"
+            >
+              WEITER <span class="arrow">→</span>
+            </button>
+          }
         </div>
       } @else {
         <div class="no-questions">

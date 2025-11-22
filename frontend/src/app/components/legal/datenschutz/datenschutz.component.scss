@@ -1,114 +1,97 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
 .legal-container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 2rem;
-  background-color: #1e1e1e;
-  color: #e0e0e0;
+  @include content-container;
+  position: relative;
   min-height: 100vh;
+  padding-top: 4rem;
 }
 
 .legal-header {
-  margin-bottom: 2rem;
+  margin-bottom: $spacing-xxl;
 
   h1 {
-    color: #fff;
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
+    @include heading('h1');
+    color: $text-primary;
+    text-align: center;
   }
 
   .back-link {
-    display: inline-block;
-    color: #fff;
-    text-decoration: none;
-    margin-bottom: 1rem;
-    font-size: 1rem;
-    transition: color 0.3s ease;
-
-    &:hover {
-      color: rgba(54, 162, 235, 1);
-    }
+    @include back-link;
   }
 }
 
 .legal-content {
-  line-height: 1.8;
+  @include card;
+  line-height: $line-height-base;
 
   section {
-    margin-bottom: 2.5rem;
+    margin-bottom: $spacing-xxl;
 
     h2 {
-      color: rgba(54, 162, 235, 1);
-      font-size: 1.8rem;
-      margin-bottom: 1rem;
-      margin-top: 2rem;
+      @include heading('h2');
+      color: $accent-primary;
+      margin-top: $spacing-xl;
     }
 
     h3 {
-      color: rgba(255, 206, 86, 1);
-      font-size: 1.4rem;
-      margin-bottom: 0.8rem;
-      margin-top: 1.5rem;
+      @include heading('h3');
+      color: $accent-secondary;
+      margin-top: $spacing-lg;
     }
 
     h4 {
-      color: #fff;
-      font-size: 1.1rem;
-      margin-bottom: 0.6rem;
-      margin-top: 1rem;
+      @include heading('h4');
+      color: $text-primary;
+      margin-top: $spacing-md;
     }
 
     p {
-      margin-bottom: 1rem;
-      color: #e0e0e0;
+      margin-bottom: $spacing-md;
+      color: $text-primary;
     }
 
     a {
-      color: rgba(54, 162, 235, 1);
+      color: $accent-primary;
       text-decoration: underline;
-      transition: color 0.3s ease;
+      transition: color $transition-fast;
 
       &:hover {
-        color: rgba(255, 206, 86, 1);
+        color: $accent-secondary;
       }
     }
 
     ul {
-      margin-left: 1.5rem;
-      margin-bottom: 1rem;
+      margin-left: $spacing-lg;
+      margin-bottom: $spacing-md;
 
       li {
-        margin-bottom: 0.5rem;
-        color: #e0e0e0;
+        margin-bottom: $spacing-sm;
+        color: $text-primary;
       }
     }
   }
 
   .last-updated {
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 1px solid #444;
+    margin-top: $spacing-xxl;
+    padding-top: $spacing-xl;
+    border-top: 1px solid $divider-color;
     text-align: center;
 
     small {
-      color: #888;
+      @include text-small;
     }
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: $breakpoint-md) {
   .legal-container {
-    padding: 1rem;
+    padding: $spacing-lg;
+    padding-top: 3rem;
   }
 
-  .legal-header h1 {
-    font-size: 2rem;
-  }
-
-  .legal-content section h2 {
-    font-size: 1.5rem;
-  }
-
-  .legal-content section h3 {
-    font-size: 1.2rem;
+  .legal-content {
+    padding: $spacing-lg;
   }
 }

@@ -1,279 +1,269 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
 .question-view-container {
-  max-width: 1000px;
+  max-width: 900px;
   margin: 0 auto;
-  padding: 2rem;
-
-  .header {
-    margin-bottom: 2rem;
-
-    .back-link {
-      display: inline-block;
-      margin-bottom: 1rem;
-      color: #007bff;
-      text-decoration: none;
-      font-size: 1rem;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-
-    h1 {
-      font-size: 2rem;
-      color: #333;
-      margin: 0;
-    }
-  }
+  padding: $spacing-xl;
 
   .error-message {
-    background-color: #fee;
-    border: 1px solid #fcc;
-    border-radius: 8px;
-    padding: 1rem;
-    margin-bottom: 2rem;
-    color: #c33;
+    @include card;
+    background-color: rgba($error-color, 0.1);
+    border: 1px solid $error-color;
+    color: $error-dark;
+    margin-bottom: $spacing-xl;
 
     button {
-      margin-top: 0.5rem;
-      padding: 0.5rem 1rem;
-      background-color: #c33;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-
-      &:hover {
-        background-color: #a22;
-      }
+      @include button-variant($error-color);
+      margin-top: $spacing-sm;
     }
   }
 
   .loading {
-    text-align: center;
-    padding: 2rem;
-    font-size: 1.1rem;
-    color: #666;
+    @include flex-center;
+    padding: $spacing-xl;
+    color: $text-secondary;
+    font-size: $font-size-large;
   }
 
   .content {
-    .progress-section {
-      margin-bottom: 2rem;
+    .question-card {
+      @include card;
+      padding: $spacing-xxl;
+      margin-bottom: $spacing-lg;
 
-      .progress-info {
+      .card-header {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 0.5rem;
-        font-size: 0.9rem;
-        color: #666;
-      }
+        align-items: center;
+        margin-bottom: $spacing-xl;
 
-      .progress-bar {
-        width: 100%;
-        height: 8px;
-        background-color: #eee;
-        border-radius: 4px;
-        overflow: hidden;
+        .category-badge {
+          display: flex;
+          align-items: center;
+          gap: $spacing-sm;
+          color: $text-secondary;
+          font-size: $font-size-small;
 
-        .progress-fill {
-          height: 100%;
-          background-color: #007bff;
-          transition: width 0.3s ease;
-        }
-      }
-    }
-
-    .question-card {
-      background-color: white;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 2rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-      .question-header {
-        margin-bottom: 2rem;
-
-        h2 {
-          font-size: 1.5rem;
-          color: #333;
-          margin: 0 0 1rem 0;
-        }
-
-        .question-image {
-          margin-top: 1rem;
-
-          img {
-            max-width: 250px;
-            height: auto;
-            border-radius: 4px;
-            max-height: 250px;
+          .icon {
+            font-size: 1.2em;
           }
+        }
+
+        .question-number {
+          color: $text-secondary;
+          font-size: $font-size-small;
+        }
+      }
+
+      .question-title {
+        font-size: $font-size-h3;
+        font-weight: $font-weight-semibold;
+        color: $text-primary;
+        margin-bottom: $spacing-xl;
+        line-height: $line-height-relaxed;
+      }
+
+      .question-image {
+        margin-bottom: $spacing-xl;
+        text-align: center;
+
+        img {
+          max-width: 60%;
+          max-height: 250px;
+          border-radius: $border-radius-md;
+          background-color: #000;
         }
       }
 
       .answers-section {
-        margin-bottom: 2rem;
+        margin-bottom: $spacing-xl;
 
         .answer-option {
           display: flex;
           align-items: center;
-          padding: 1rem;
-          margin-bottom: 0.75rem;
-          border: 2px solid #ddd;
-          border-radius: 4px;
+          padding: $spacing-lg;
+          margin-bottom: $spacing-md;
+          background-color: $bg-tertiary;
+          border: 2px solid $border-color;
+          border-radius: $border-radius-md;
           cursor: pointer;
-          transition: all 0.3s ease;
+          transition: all $transition-normal;
 
           &:hover {
-            border-color: #007bff;
-            background-color: #f5f9ff;
+            border-color: $accent-primary;
+            background-color: lighten($bg-tertiary, 3%);
           }
 
           &.selected {
-            background-color: #e7f3ff;
-            border-color: #007bff;
-
-            input {
-              accent-color: #007bff;
-            }
+            background-color: rgba($accent-primary, 0.15);
+            border-color: $accent-primary;
           }
 
-          input {
-            margin-right: 1rem;
-            cursor: pointer;
+          &.correct {
+            background-color: rgba(#4caf50, 0.15);
+            border-color: #4caf50;
+            border-width: 3px;
+          }
+
+          &.incorrect {
+            background-color: rgba($error-color, 0.15);
+            border-color: $error-color;
+            border-width: 3px;
+          }
+
+          input[type="radio"] {
             width: 20px;
             height: 20px;
+            margin-right: $spacing-lg;
+            cursor: pointer;
+            accent-color: $accent-primary;
           }
 
           .answer-text {
             flex: 1;
-            color: #333;
+            color: $text-primary;
+            font-size: $font-size-base;
+            line-height: $line-height-relaxed;
           }
         }
       }
 
-      .actions {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
+      .hint-section {
+        border-top: 1px solid $border-color;
+        padding-top: $spacing-lg;
 
-        .btn {
-          padding: 0.75rem 1.5rem;
-          border: none;
-          border-radius: 4px;
-          font-size: 1rem;
+        .hint-button {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: $spacing-sm;
+          padding: $spacing-md;
+          background-color: transparent;
+          border: 1px solid $border-color;
+          border-radius: $border-radius-md;
+          color: $accent-primary;
+          font-size: $font-size-small;
+          font-weight: $font-weight-medium;
           cursor: pointer;
-          transition: all 0.3s ease;
+          transition: all $transition-normal;
 
-          &.btn-primary {
-            background-color: #007bff;
-            color: white;
-
-            &:hover:not(:disabled) {
-              background-color: #0056b3;
-            }
+          &:hover {
+            background-color: rgba($accent-primary, 0.1);
+            border-color: $accent-primary;
           }
 
-          &.btn-secondary {
-            background-color: #6c757d;
-            color: white;
-
-            &:hover:not(:disabled) {
-              background-color: #545b62;
-            }
+          .icon {
+            font-size: 1.2em;
           }
 
-          &:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+          .arrow {
+            margin-left: auto;
           }
         }
       }
     }
 
-    .navigator-section {
-      background-color: #f8f9fa;
-      padding: 1.5rem;
-      border-radius: 8px;
+    .bottom-navigation {
+      display: flex;
+      justify-content: space-between;
+      gap: $spacing-md;
 
-      h3 {
-        margin: 0 0 1rem 0;
-        color: #333;
+      .nav-btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: $spacing-sm;
+        padding: $spacing-lg $spacing-xl;
+        background-color: $bg-card;
+        border: 1px solid $border-color;
+        border-radius: $border-radius-md;
+        color: $text-primary;
+        font-size: $font-size-small;
+        font-weight: $font-weight-medium;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        transition: all $transition-normal;
+
+        &:hover:not(:disabled) {
+          background-color: rgba($accent-primary, 0.1);
+          border-color: $accent-primary;
+          color: $accent-primary;
+        }
+
+        &:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
+
+        .arrow {
+          font-size: 1.2em;
+        }
       }
 
-      .question-navigator {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
+      .back-btn {
+        background-color: rgba($error-color, 0.1);
+        border-color: $error-color;
+        color: $error-color;
 
-        .nav-button {
-          width: 40px;
-          height: 40px;
-          padding: 0;
-          border: 2px solid #ddd;
-          border-radius: 4px;
-          background-color: white;
-          cursor: pointer;
-          font-weight: 500;
-          transition: all 0.2s ease;
+        &:hover {
+          background-color: rgba($error-color, 0.2);
+          border-color: darken($error-color, 10%);
+        }
+      }
 
-          &:hover {
-            border-color: #007bff;
-          }
+      .reveal-btn {
+        background-color: rgba($accent-primary, 0.1);
+        border-color: $accent-primary;
+        color: $accent-primary;
 
-          &.current {
-            background-color: #007bff;
-            color: white;
-            border-color: #007bff;
-          }
+        &:hover:not(:disabled) {
+          background-color: rgba($accent-primary, 0.2);
+          border-color: darken($accent-primary, 10%);
+        }
+      }
 
-          &.answered {
-            background-color: #d4edda;
-            border-color: #28a745;
-            color: #28a745;
-            font-weight: bold;
-          }
+      .prev-btn {
+        justify-content: flex-start;
+      }
 
-          &.incorrect {
-            background-color: #f8d7da;
-            border-color: #dc3545;
-            color: #dc3545;
-            font-weight: bold;
-          }
+      .next-btn {
+        justify-content: flex-end;
+      }
+    }
+  }
+}
 
-          &.current.incorrect {
-            background-color: #dc3545;
-            color: white;
-            border-color: #dc3545;
-          }
+@media (max-width: $breakpoint-md) {
+  .question-view-container {
+    padding: $spacing-lg;
+
+    .content {
+      .question-card {
+        padding: $spacing-lg;
+
+        .question-image img {
+          max-height: 250px;
         }
       }
     }
   }
+}
 
-  .no-questions {
-    text-align: center;
-    padding: 2rem;
+@media (max-width: $breakpoint-sm) {
+  .question-view-container {
+    padding: $spacing-md;
 
-    p {
-      font-size: 1.1rem;
-      color: #666;
-      margin-bottom: 1rem;
-    }
+    .content {
+      .bottom-navigation {
+        flex-direction: column;
 
-    .btn {
-      padding: 0.75rem 1.5rem;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      text-decoration: none;
-      display: inline-block;
-      cursor: pointer;
-      transition: all 0.3s ease;
-
-      &:hover {
-        background-color: #0056b3;
+        .nav-btn {
+          width: 100%;
+        }
       }
     }
   }

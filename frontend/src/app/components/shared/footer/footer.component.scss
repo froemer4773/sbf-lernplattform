@@ -1,40 +1,41 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
 .app-footer {
-  background-color: #2a2a2a;
-  color: #e0e0e0;
-  padding: 1.5rem 2rem;
-  border-top: 1px solid #444;
+  background-color: $bg-card;
+  color: $text-secondary;
+  padding: $spacing-lg $spacing-xl;
+  border-top: 1px solid $border-color;
   margin-top: auto;
 }
 
 .footer-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
+  @include container;
+  @include flex-column;
   align-items: center;
-  gap: 1rem;
+  gap: $spacing-md;
 }
 
 .footer-links {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: $spacing-md;
   flex-wrap: wrap;
   justify-content: center;
 
   .footer-link {
-    color: #e0e0e0;
+    color: $text-secondary;
     text-decoration: none;
-    transition: color 0.3s ease;
-    font-size: 0.95rem;
+    transition: color $transition-fast;
+    @include text-small;
 
     &:hover {
-      color: rgba(54, 162, 235, 1);
+      color: $accent-primary;
     }
   }
 
   .separator {
-    color: #666;
+    color: $border-color;
   }
 }
 
@@ -43,21 +44,22 @@
 
   p {
     margin: 0;
-    font-size: 0.85rem;
-    color: #888;
+    @include text-small;
+    color: $text-disabled;
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: $breakpoint-sm) {
   .app-footer {
-    padding: 1rem;
+    padding: $spacing-md;
   }
 
   .footer-links {
-    font-size: 0.9rem;
-  }
+    flex-direction: column;
+    gap: $spacing-sm;
 
-  .footer-copyright p {
-    font-size: 0.8rem;
+    .separator {
+      display: none;
+    }
   }
 }

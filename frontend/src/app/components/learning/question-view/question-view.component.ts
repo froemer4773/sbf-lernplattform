@@ -25,11 +25,14 @@ export class QuestionViewComponent {
   selectedAnswers = signal<Map<number, string>>(new Map());
   incorrectAnswers = signal<Set<number>>(new Set());
   shuffledAnswers = signal<Map<number, any[]>>(new Map());
+  answerResults = signal<Array<{frage_id: number, frage_text: string, selected_answer: string, correct_answer: string, is_correct: boolean}>>([]);
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
   schein = signal<string>('');
   kategorie = signal<string>('');
   unterkategorie = signal<string | null>(null);
+  showHint = signal<boolean>(false);
+  revealed = signal<boolean>(false);
 
   currentQuestion = computed(() => {
     const questions = this.questions();
@@ -206,6 +209,7 @@ export class QuestionViewComponent {
     const index = this.currentQuestionIndex();
     if (index < this.questions().length - 1) {
       this.currentQuestionIndex.set(index + 1);
+      this.revealed.set(false);
       // reset question timer for the new question
       this.questionStart = Date.now();
     }
@@ -215,6 +219,7 @@ export class QuestionViewComponent {
     const index = this.currentQuestionIndex();
     if (index > 0) {
       this.currentQuestionIndex.set(index - 1);
+      this.revealed.set(false);
       // reset question timer when navigating
       this.questionStart = Date.now();
     }
@@ -263,6 +268,19 @@ export class QuestionViewComponent {
       next: (response) => {
         console.log('Antwort eingereicht:', response);
 
+        // Speichere Ergebnis
+        const currentResults = this.answerResults();
+        currentResults.push({
+          frage_id: question.frage_id,
+          frage_text: question.frage_text,
+          selected_answer: selectedAnswer!,
+          correct_answer: response.korrekte_antwort || question.korrekte_antwort,
+          is_correct: response.is_correct
+        });
+        this.answerResults.set(currentResults);
+
+        console.log('answerResults nach submit:', this.answerResults().length, 'von', this.questions().length);
+
         // Track if answer was incorrect
         if (response.is_correct === false && question) {
           const newIncorrect = new Set(this.incorrectAnswers());
@@ -283,8 +301,8 @@ export class QuestionViewComponent {
         const allAnswered = this.answeredCount >= totalQuestions;
 
         if (allAnswered) {
-          console.log('All questions answered. Ending session.');
-          this.endSessionAndNavigate('/learning/category-selection');
+          console.log('All questions answered. Navigating to results.');
+          this.showResults();
         } else {
           this.nextQuestion();
         }
@@ -312,6 +330,76 @@ export class QuestionViewComponent {
 
   isIncorrectAnswer(questionId: number): boolean {
     return this.incorrectAnswers().has(questionId);
+  }
+
+  toggleHint(): void {
+    this.showHint.update(v => !v);
+  }
+
+  revealAnswer(): void {
+    const question = this.currentQuestion();
+    if (!question || this.revealed()) return;
+
+    this.revealed.set(true);
+
+    // Als falsch werten (wie gewünscht)
+    const now = Date.now();
+    let timeTakenSeconds = Math.round((now - this.questionStart) / 1000);
+    if (timeTakenSeconds <= 0) timeTakenSeconds = 1;
+
+    // Finde die richtige Antwort (ist_korrekt ist eine Zahl: 1 = richtig)
+    const correctAnswer = question.antworten.find(a => a.ist_korrekt === 1);
+    if (correctAnswer) {
+      const request: SubmitAnswerRequest = {
+        frage_id: question.frage_id,
+        selected_answer: correctAnswer.buchstabe,
+        time_taken_seconds: timeTakenSeconds
+      };
+
+      this.apiService.submitAnswer(request).subscribe({
+        next: (response) => {
+          console.log('Antwort als falsch gewertet:', response);
+
+          // Speichere Ergebnis
+          const currentResults = this.answerResults();
+          currentResults.push({
+            frage_id: question.frage_id,
+            frage_text: question.frage_text,
+            selected_answer: 'Aufgedeckt',
+            correct_answer: response.korrekte_antwort || question.korrekte_antwort,
+            is_correct: false
+          });
+          this.answerResults.set(currentResults);
+
+          // Als falsch markieren
+          const newIncorrect = new Set(this.incorrectAnswers());
+          newIncorrect.add(question.frage_id);
+          this.incorrectAnswers.set(newIncorrect);
+
+          this.totalSessionSeconds += timeTakenSeconds;
+          this.answeredCount++;
+        },
+        error: (err) => {
+          console.error('Fehler beim Aufdecken:', err);
+        }
+      });
+    }
+  }
+
+  showResults() {
+    console.log('showResults called');
+    console.log('answerResults:', this.answerResults());
+    console.log('schein:', this.schein());
+    console.log('kategorie:', this.kategorie());
+
+    this.router.navigate(['/learning/result'], {
+      state: {
+        results: this.answerResults(),
+        schein: this.schein(),
+        kategorie: this.kategorie(),
+        unterkategorie: this.unterkategorie()
+      }
+    });
   }
 
   private shuffleArray<T>(array: T[]): T[] {

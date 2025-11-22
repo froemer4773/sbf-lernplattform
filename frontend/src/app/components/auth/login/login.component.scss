@@ -1,202 +1,107 @@
-﻿.login-container {
+﻿@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
+.login-container {
+  @include flex-center;
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  /* Dark noisy background */
-  background-color: rgb(45,45,45);
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><filter id='n'><feTurbulence baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncA type='table' tableValues='0 0.06'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.06' /></svg>");
-  background-repeat: repeat;
-  padding: 20px;
+  padding: $spacing-lg;
 }
 
 .login-card {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-  max-width: 450px;
-  width: min(100%, 450px);
-  padding: 48px;
-  box-sizing: border-box;
-  animation: slideIn 0.4s ease-out;
-  overflow: hidden;
-}
+  @include card;
+  max-width: $card-max-width;
+  width: 100%;
+  padding: $spacing-xxl;
+  animation: slideIn $transition-slow;
 
-/* Ensure inputs and buttons don't overflow their container on small screens */
-.login-card,
-.login-card * {
-  box-sizing: border-box;
-}
-
-.login-card input,
-.login-card button,
-.login-card textarea {
-  display: block;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.logo-section {
-  text-align: center;
-  margin-bottom: 40px;
-
-  h1 {
-    font-size: 36px;
-    color: #1976D2;
-    margin-bottom: 12px;
-    font-weight: 700;
-  }
-
-  p {
-    color: #666;
-  }
-}
-
-/* make login form styles */
-.login-form {
-  h2 {
-    font-size: 28px;
-    margin-bottom: 32px;
-    color: #333;
-    font-weight: 600;
-  }
-
-  .form-group {
-    margin-bottom: 24px;
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      color: #555;
-      font-weight: 500;
-      font-size: 14px;
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
     }
-
-    input {
-      width: 100%;
-      max-width: 100%;
-      padding: 12px 14px;
-      border: 2px solid #E0E0E0;
-      border-radius: 10px;
-      font-size: 16px;
-      transition: all 0.3s;
-      font-family: inherit;
-
-      &:focus {
-        outline: none;
-        border-color: #1976D2;
-        box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
-      }
-
-      &:disabled {
-        background-color: #F5F5F5;
-        cursor: not-allowed;
-      }
-
-      &::placeholder {
-        color: #999;
-      }
-    }
-  }
-
-  .error-message {
-    background-color: #FFEBEE;
-    color: #C62828;
-    padding: 14px 16px;
-    border-radius: 10px;
-    margin-bottom: 24px;
-    font-size: 14px;
-    border-left: 4px solid #C62828;
-  }
-
-  .btn-primary {
-    width: 100%;
-    padding: 16px;
-    background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 18px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
-
-    &:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(25, 118, 210, 0.4);
-    }
-
-    &:active:not(:disabled) {
+    to {
+      opacity: 1;
       transform: translateY(0);
     }
+  }
 
-    &:disabled {
-      background: #BDBDBD;
-      cursor: not-allowed;
-      box-shadow: none;
+  .logo-section {
+    text-align: center;
+    margin-bottom: $spacing-xxl;
+
+    h1 {
+      @include heading('h1');
+      color: $accent-primary;
+      margin-bottom: $spacing-sm;
+    }
+
+    p {
+      @include text-body;
+      color: $text-secondary;
     }
   }
 
-  .register-link {
-    text-align: center;
-    margin-top: 24px;
-    color: #666;
-    font-size: 14px;
+  .login-form {
+    h2 {
+      @include heading('h2');
+      margin-bottom: $spacing-xl;
+      text-align: center;
+    }
 
-    a {
-      color: #1976D2;
-      cursor: pointer;
-      text-decoration: none;
-      font-weight: 600;
-      margin-left: 4px;
+    .form-group {
+      margin-bottom: $spacing-lg;
 
-      &:hover {
-        text-decoration: underline;
+      label {
+        display: block;
+        margin-bottom: $spacing-sm;
+        color: $text-primary;
+        font-weight: $font-weight-medium;
+      }
+
+      input {
+        @include input-base;
+      }
+    }
+
+    .error-message {
+      background-color: rgba($error-color, 0.1);
+      border: 1px solid $error-color;
+      border-radius: $border-radius-md;
+      padding: $spacing-md;
+      margin-bottom: $spacing-lg;
+      color: $error-dark;
+      @include text-small;
+    }
+
+    .submit-btn {
+      @include button-variant($accent-primary);
+      width: 100%;
+      margin-top: $spacing-md;
+      font-size: $font-size-large;
+      padding: $spacing-md;
+    }
+
+    .register-link {
+      text-align: center;
+      margin-top: $spacing-lg;
+      @include text-body;
+      color: $text-secondary;
+
+      a {
+        color: $accent-primary;
+        font-weight: $font-weight-medium;
+
+        &:hover {
+          color: lighten($accent-primary, 10%);
+          text-decoration: underline;
+        }
       }
     }
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: $breakpoint-sm) {
   .login-card {
-    padding: 28px 20px;
-  }
-
-  .logo-section h1 {
-    font-size: 28px;
-  }
-}
-
-@media (max-width: 420px) {
-  .login-card {
-    padding: 20px 14px;
-    border-radius: 0;
-  }
-
-  .login-form h2 {
-    font-size: 22px;
-    margin-bottom: 20px;
-  }
-
-  .login-form .form-group input {
-    padding: 10px 12px;
-    font-size: 14px;
-  }
-
-  .login-form .btn-primary {
-    padding: 12px;
-    font-size: 16px;
+    padding: $spacing-xl;
   }
 }

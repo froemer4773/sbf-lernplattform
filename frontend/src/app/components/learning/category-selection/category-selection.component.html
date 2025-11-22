@@ -1,8 +1,11 @@
 <div class="category-selection-container">
   <div class="header">
-    <a [routerLink]="['/dashboard']" class="back-link">← Zurück</a>
-    <h1>Lernbereich</h1>
-    <p>Wähle einen Führerschein und eine Kategorie zum Lernen</p>
+    <div class="header-content">
+      <button class="back-button" (click)="goBack()">
+        <span class="arrow">←</span> Zurück zum Dashboard
+      </button>
+      <h1>Wählen Sie eine Kategorie</h1>
+    </div>
   </div>
 
   @if (error(); as errorMsg) {
@@ -18,63 +21,87 @@
     </div>
   } @else {
     <div class="content">
-      <!-- Lizenz-Auswahl -->
-      <div class="licenses-section">
-        <h2>Führerscheinart</h2>
-        <div class="licenses-grid">
-          @for (license of licenses(); track license.name) {
-            <button
-              class="license-button"
-              [class.active]="selectedLicense() === license.name"
-              (click)="selectLicense(license)"
-            >
-              {{ license.name }}
-            </button>
-          }
-        </div>
-      </div>
-
-      <!-- Kategorien (Basisfragen) -->
-      @if (categories().length > 0) {
-        <div class="categories-section">
-          <h2>Kategorie (Basisfragen)</h2>
-          <div class="categories-grid">
-            @for (category of categories(); track category.name) {
+      <!-- Lizenz-Auswahl (falls mehrere) -->
+      @if (licenses().length > 1) {
+        <div class="licenses-section">
+          <div class="licenses-grid">
+            @for (license of licenses(); track license.name) {
               <button
-                class="category-card"
-                [class.active]="selectedCategory() === category.name"
-                (click)="selectCategory(category.name)"
+                class="license-button"
+                [class.active]="selectedLicense() === license.name"
+                (click)="selectLicense(license)"
               >
-                <h3>{{ category.name }}</h3>
-                <p class="question-count">{{ category.count }} Fragen</p>
+                {{ license.name }}
               </button>
             }
           </div>
         </div>
       }
 
-      <!-- Unterkategorien -->
+      <!-- Kategorien als Icon-Liste (wie im Screenshot) -->
+      @if (categories().length > 0) {
+        <div class="categories-section">
+          <div class="categories-list">
+            @for (category of categories(); track category.name) {
+              <div
+                class="category-item"
+                [class.active]="selectedCategory() === category.name"
+                (click)="selectCategory(category.name)"
+              >
+                <div class="category-icon">
+                  <span>{{ getCategoryIcon(category.name) }}</span>
+                </div>
+                <div class="category-content">
+                  <h3 class="category-title">{{ category.name }}</h3>
+                  <p class="category-subtitle">{{ category.count }} Fragen</p>
+                </div>
+                <div class="category-arrow">
+                  <span>›</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Unterkategorien (bei Auswahl einer Kategorie) -->
       @if (subcategories().length > 0) {
         <div class="subcategories-section">
           <h2>Unterkategorie wählen</h2>
-          <div class="categories-grid">
+          <div class="subcategories-list">
             <!-- Alle Option -->
             <a
               [routerLink]="['/learning/questions', selectedLicense(), selectedCategory()]"
-              class="category-card all-option"
+              class="subcategory-item all-option"
             >
-              <h3>Alle</h3>
-              <p class="question-count">{{ getTotalQuestionsForCategory() }} Fragen</p>
+              <div class="subcategory-icon">
+                <span>📚</span>
+              </div>
+              <div class="subcategory-content">
+                <h3 class="subcategory-title">Alle</h3>
+                <p class="subcategory-subtitle">{{ getTotalQuestionsForCategory() }} Fragen</p>
+              </div>
+              <div class="subcategory-arrow">
+                <span>›</span>
+              </div>
             </a>
             <!-- Individual Subcategories -->
             @for (subcategory of subcategories(); track subcategory.name) {
               <a
                 [routerLink]="['/learning/questions', selectedLicense(), selectedCategory()]"
                 [queryParams]="{unterkategorie: subcategory.name}"
-                class="category-card"
+                class="subcategory-item"
               >
-                <h3>{{ subcategory.name }}</h3>
-                <p class="question-count">{{ subcategory.count }} Fragen</p>
+                <div class="subcategory-icon">
+                  <span>📄</span>
+                </div>
+                <div class="subcategory-content">
+                  <h3 class="subcategory-title">{{ subcategory.name }}</h3>
+                  <p class="subcategory-subtitle">{{ subcategory.count }} Fragen</p>
+                </div>
+                <div class="subcategory-arrow">
+                  <span>›</span>
+                </div>
               </a>
             }
           </div>

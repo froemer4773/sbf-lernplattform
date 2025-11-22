@@ -1,26 +1,23 @@
-/* empty */
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
 .chapter-list-container {
-	max-width: 900px;
-	margin: 0 auto;
-	padding: 2rem;
+  @include content-container;
+  position: relative;
+  padding-top: 4rem;
 
-	.header {
-		position: relative;
-		margin-bottom: 1.5rem;
+  .header {
+    position: relative;
+    margin-bottom: $spacing-xxl;
 
-		.back-link {
-			display: inline-block;
-			position: absolute;
-			left: 0;
-			top: 0;
-			color: #007bff;
-			text-decoration: none;
-			font-weight: 500;
-		}
+    .back-link {
+      @include back-link;
+    }
 
-		h1 {
-			text-align: center;
-			font-size: 1.5rem;
-		}
-	}
+    h1 {
+      @include heading('h2');
+      color: $text-primary;
+      text-align: center;
+    }
+  }
 }

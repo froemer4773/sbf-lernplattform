@@ -1,6 +1,6 @@
 import { Component, signal, effect, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
 import { AuthService } from '../../../services/auth.service';
 import { License, Category } from '../../../models/models';
@@ -25,7 +25,8 @@ export class CategorySelectionComponent {
 
   constructor(
     private apiService: ApiService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {
     this.loadLicenses();
 
@@ -145,5 +146,23 @@ export class CategorySelectionComponent {
 
   getTotalQuestionsForCategory(): number {
     return this.allQuestionsForCategory.length;
+  }
+
+  getCategoryIcon(categoryName: string): string {
+    const iconMap: {[key: string]: string} = {
+      'Gesetzliche Grundlagen': '📖',
+      'Schallsignale': '🔊',
+      'Lichter und Sichtzeichen': '🚩',
+      'Seemannschaft': '⚓',
+      'Ausweichregeln': '🔀',
+      'Schifffahrtszeichen': '🏴',
+      'Verkehrstrennungsgebiete': '🚦',
+      'Fahrwasser': '〰️'
+    };
+    return iconMap[categoryName] || '📚';
+  }
+
+  goBack() {
+    this.router.navigate(['/dashboard']);
   }
 }

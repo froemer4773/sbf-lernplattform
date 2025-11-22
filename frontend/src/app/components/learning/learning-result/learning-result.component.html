@@ -1,0 +1,79 @@
+<div class="result-container">
+  <div class="result-header">
+    <h1>Lernergebnis</h1>
+    <p class="subtitle">{{ schein() }} - {{ kategorie() }}</p>
+  </div>
+
+  <div class="summary-section">
+    <div class="summary-card">
+      <div class="summary-stats">
+        <div class="stat-item correct">
+          <div class="stat-icon">✓</div>
+          <div class="stat-content">
+            <div class="stat-value">{{ correctCount() }}</div>
+            <div class="stat-label">Richtig</div>
+          </div>
+        </div>
+
+        <div class="stat-item incorrect">
+          <div class="stat-icon">✕</div>
+          <div class="stat-content">
+            <div class="stat-value">{{ incorrectCount() }}</div>
+            <div class="stat-label">Falsch</div>
+          </div>
+        </div>
+
+        <div class="stat-item total">
+          <div class="stat-icon">Σ</div>
+          <div class="stat-content">
+            <div class="stat-value">{{ totalCount() }}</div>
+            <div class="stat-label">Gesamt</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="success-rate">
+        <div class="rate-label">Erfolgsquote</div>
+        <div class="rate-value" [class.good]="successRate() >= 80" [class.medium]="successRate() >= 60 && successRate() < 80" [class.low]="successRate() < 60">
+          {{ successRate() }}%
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="results-table-section">
+    <h2>Detaillierte Ergebnisse</h2>
+    <div class="results-table">
+      <div class="table-header">
+        <div class="col-status">Status</div>
+        <div class="col-question">Frage</div>
+        <div class="col-answer">Ihre Antwort</div>
+        <div class="col-correct">Richtige Antwort</div>
+      </div>
+
+      @for (result of results(); track result.frage_id) {
+        <div class="table-row" [class.correct]="result.is_correct" [class.incorrect]="!result.is_correct">
+          <div class="col-status">
+            @if (result.is_correct) {
+              <span class="status-icon correct">✓</span>
+            } @else {
+              <span class="status-icon incorrect">✕</span>
+            }
+          </div>
+          <div class="col-question">{{ result.frage_text }}</div>
+          <div class="col-answer">{{ result.selected_answer }}</div>
+          <div class="col-correct">{{ result.correct_answer }}</div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="actions-section">
+    <button class="btn-secondary" (click)="backToCategories()">
+      ← Zurück zur Kategorieauswahl
+    </button>
+    <button class="btn-primary" (click)="retryQuestions()">
+      Erneut üben →
+    </button>
+  </div>
+</div>
