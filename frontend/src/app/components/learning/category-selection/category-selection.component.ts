@@ -14,11 +14,14 @@ import { License, Category } from '../../../models/models';
 })
 export class CategorySelectionComponent {
   licenses = signal<License[]>([]);
-  categories = signal<Category[]>([]);
-  subcategories = signal<{kategorie: string, unterkategorie: string}[]>([]);
+  categories = signal<{name: string, count: number}[]>([]);
+  subcategories = signal<{name: string, count: number}[]>([]);
   selectedLicense = signal<string | null>(null);
+  selectedCategory = signal<string | null>(null);
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
+  private allQuestionsForLicense: any[] = [];
+  private allQuestionsForCategory: any[] = [];
 
   constructor(
     private apiService: ApiService,
@@ -32,7 +35,16 @@ export class CategorySelectionComponent {
       if (selected) {
         this.loadCategories(selected);
       }
-    });
+    }, { allowSignalWrites: true });
+
+    // Lade Unterkategorien, wenn eine Kategorie ausgewählt wird
+    effect(() => {
+      const license = this.selectedLicense();
+      const category = this.selectedCategory();
+      if (license && category) {
+        this.loadSubcategories(license, category);
+      }
+    }, { allowSignalWrites: true });
   }
 
   loadLicenses() {
@@ -58,53 +70,27 @@ export class CategorySelectionComponent {
   loadCategories(license: string) {
     this.loading.set(true);
     this.error.set(null);
+    this.selectedCategory.set(null);
+    this.subcategories.set([]);
 
-    // Load all questions and extract unique categories from them
+    // Load all questions and extract unique categories
     this.apiService.getQuestions(license).subscribe({
       next: (questions) => {
-        // Group questions by category and unterkategorie
-        const categoryMap = new Map<string, Set<{name: string, fragen_anzahl: number}>>();
+        this.allQuestionsForLicense = questions;
 
+        // Count questions per category
+        const categoryMap = new Map<string, number>();
         questions.forEach(q => {
-          if (!categoryMap.has(q.kategorie)) {
-            categoryMap.set(q.kategorie, new Set());
-          }
-          const subCategories = categoryMap.get(q.kategorie)!;
-          subCategories.add({
-            name: q.unterkategorie,
-            fragen_anzahl: 0
-          });
+          categoryMap.set(q.kategorie, (categoryMap.get(q.kategorie) || 0) + 1);
         });
 
-        // Count questions per subcategory
-        questions.forEach(q => {
-          const subCategories = categoryMap.get(q.kategorie)!;
-          const subCat = Array.from(subCategories).find(s => s.name === q.unterkategorie);
-          if (subCat) {
-            subCat.fragen_anzahl++;
-          }
-        });
-
-        // Convert to Category interface
-        const categories: any[] = Array.from(categoryMap.entries()).map(([kategorie, subCats]) => ({
-          kategorie,
-          unterkategorien: Array.from(subCats)
+        // Convert to array with counts
+        const categoriesWithCounts = Array.from(categoryMap.entries()).map(([name, count]) => ({
+          name,
+          count
         }));
 
-        this.categories.set(categories);
-
-        // Flatten subcategories for display
-        const flatSubcategories: {kategorie: string, unterkategorie: string}[] = [];
-        categories.forEach(cat => {
-          cat.unterkategorien.forEach((sub: any) => {
-            flatSubcategories.push({
-              kategorie: cat.kategorie,
-              unterkategorie: sub.name
-            });
-          });
-        });
-        this.subcategories.set(flatSubcategories);
-
+        this.categories.set(categoriesWithCounts);
         this.loading.set(false);
       },
       error: (err) => {
@@ -115,14 +101,49 @@ export class CategorySelectionComponent {
     });
   }
 
-  selectLicense(license: License) {
-    this.selectedLicense.set(license.name);
+  loadSubcategories(license: string, category: string) {
+    this.loading.set(true);
+    this.error.set(null);
+
+    // Load questions for this category and extract unique subcategories
+    this.apiService.getQuestions(license, category).subscribe({
+      next: (questions) => {
+        this.allQuestionsForCategory = questions;
+
+        // Count questions per subcategory
+        const subcategoryMap = new Map<string, number>();
+        questions.forEach(q => {
+          subcategoryMap.set(q.unterkategorie, (subcategoryMap.get(q.unterkategorie) || 0) + 1);
+        });
+
+        // Convert to array with counts
+        const subcategoriesWithCounts = Array.from(subcategoryMap.entries()).map(([name, count]) => ({
+          name,
+          count
+        }));
+
+        this.subcategories.set(subcategoriesWithCounts);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Fehler beim Laden der Unterkategorien:', err);
+        this.error.set('Fehler beim Laden der Unterkategorien');
+        this.loading.set(false);
+      }
+    });
   }
 
-  getCategoryPath(category: any): string[] {
-    if (this.selectedLicense()) {
-      return ['/learning/questions', this.selectedLicense()!, category.kategorie];
-    }
-    return [];
+  selectLicense(license: License) {
+    this.selectedLicense.set(license.name);
+    this.selectedCategory.set(null);
+    this.subcategories.set([]);
+  }
+
+  selectCategory(category: string) {
+    this.selectedCategory.set(category);
+  }
+
+  getTotalQuestionsForCategory(): number {
+    return this.allQuestionsForCategory.length;
   }
 }

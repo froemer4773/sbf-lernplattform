@@ -34,18 +34,47 @@
         </div>
       </div>
 
+      <!-- Kategorien (Basisfragen) -->
+      @if (categories().length > 0) {
+        <div class="categories-section">
+          <h2>Kategorie (Basisfragen)</h2>
+          <div class="categories-grid">
+            @for (category of categories(); track category.name) {
+              <button
+                class="category-card"
+                [class.active]="selectedCategory() === category.name"
+                (click)="selectCategory(category.name)"
+              >
+                <h3>{{ category.name }}</h3>
+                <p class="question-count">{{ category.count }} Fragen</p>
+              </button>
+            }
+          </div>
+        </div>
+      }
+
       <!-- Unterkategorien -->
       @if (subcategories().length > 0) {
-        <div class="categories-section">
-          <h2>Unterkategorien für {{ selectedLicense() }}</h2>
+        <div class="subcategories-section">
+          <h2>Unterkategorie wählen</h2>
           <div class="categories-grid">
-            @for (subcategory of subcategories(); track subcategory.kategorie + '_' + subcategory.unterkategorie) {
+            <!-- Alle Option -->
+            <a
+              [routerLink]="['/learning/questions', selectedLicense(), selectedCategory()]"
+              class="category-card all-option"
+            >
+              <h3>Alle</h3>
+              <p class="question-count">{{ getTotalQuestionsForCategory() }} Fragen</p>
+            </a>
+            <!-- Individual Subcategories -->
+            @for (subcategory of subcategories(); track subcategory.name) {
               <a
-                [routerLink]="['/learning/questions', selectedLicense(), subcategory.kategorie]"
-                [queryParams]="{unterkategorie: subcategory.unterkategorie}"
+                [routerLink]="['/learning/questions', selectedLicense(), selectedCategory()]"
+                [queryParams]="{unterkategorie: subcategory.name}"
                 class="category-card"
               >
-                <h3>{{ subcategory.unterkategorie }}</h3>
+                <h3>{{ subcategory.name }}</h3>
+                <p class="question-count">{{ subcategory.count }} Fragen</p>
               </a>
             }
           </div>
