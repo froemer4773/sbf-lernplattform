@@ -1,1 +1,122 @@
-<p>exam-result works!</p>
+<div class="result-container">
+  <div class="result-card">
+    <!-- Ergebnis-Header -->
+    <div class="result-header" [class.passed]="bestanden" [class.failed]="!bestanden">
+      <div class="result-icon">
+        {{ bestanden ? '✅' : '❌' }}
+      </div>
+      <h1>{{ bestanden ? 'Bestanden!' : 'Nicht bestanden' }}</h1>
+      <p class="result-subtitle">{{ bogen.name }}</p>
+    </div>
+
+    <!-- Statistik-Übersicht -->
+    <div class="stats-grid">
+      <div class="stat-item stat-success">
+        <div class="stat-value">{{ richtigeAntworten }}</div>
+        <div class="stat-label">Richtig</div>
+      </div>
+
+      <div class="stat-item stat-error">
+        <div class="stat-value">{{ falscheAntworten }}</div>
+        <div class="stat-label">Falsch</div>
+      </div>
+
+      <div class="stat-item stat-neutral">
+        <div class="stat-value">{{ nichtBeantwortet }}</div>
+        <div class="stat-label">Nicht beantwortet</div>
+      </div>
+
+      <div class="stat-item stat-primary">
+        <div class="stat-value">{{ erfolgsquote }}%</div>
+        <div class="stat-label">Erfolgsquote</div>
+      </div>
+    </div>
+
+    <!-- Zusätzliche Infos -->
+    <div class="info-section">
+      <div class="info-row">
+        <span class="info-label">Benötigte Zeit:</span>
+        <span class="info-value">{{ bearbeitungszeitFormatted }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Zeitlimit:</span>
+        <span class="info-value">{{ bogen.zeitlimit_minuten }} Minuten</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Zum Bestehen erforderlich:</span>
+        <span class="info-value">{{ bogen.bestehensgrenze_prozent }}%</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Gesamtfragen:</span>
+        <span class="info-value">{{ fragen.length }}</span>
+      </div>
+    </div>
+
+    <!-- Detailansicht Toggle -->
+    <div class="details-toggle">
+      <button class="btn-toggle" (click)="toggleDetails()">
+        {{ showDetails ? '▼ Details ausblenden' : '▶ Details anzeigen' }}
+      </button>
+    </div>
+
+    <!-- Detaillierte Fragenübersicht -->
+    @if (showDetails) {
+      <div class="details-section">
+        <h3>Detaillierte Fragenübersicht</h3>
+
+        @for (result of detailedResults; track result.frage.id; let i = $index) {
+          <div class="question-result" [class.correct]="result.isCorrect" [class.incorrect]="!result.isCorrect && result.userAnswer !== null" [class.unanswered]="result.userAnswer === null">
+            <div class="question-result-header">
+              <span class="question-num">Frage {{ i + 1 }}</span>
+              <span class="result-badge">
+                @if (result.userAnswer === null) {
+                  Nicht beantwortet
+                } @else if (result.isCorrect) {
+                  ✓ Richtig
+                } @else {
+                  ✗ Falsch
+                }
+              </span>
+            </div>
+
+            <p class="question-text">{{ result.frage.frage_text }}</p>
+
+            <div class="answers-comparison">
+              @if (result.userAnswer) {
+                <div class="answer-info">
+                  <strong>Deine Antwort:</strong>
+                  <span [class.wrong]="!result.isCorrect">
+                    {{ result.userAnswer }} - {{ getAnswerText(result.frage, result.userAnswer) }}
+                  </span>
+                </div>
+              }
+
+              @if (!result.isCorrect) {
+                <div class="answer-info correct-answer">
+                  <strong>Richtige Antwort:</strong>
+                  <span class="correct">
+                    {{ result.frage.richtige_antwort }} - {{ getAnswerText(result.frage, result.frage.richtige_antwort) }}
+                  </span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Aktions-Buttons -->
+    <div class="action-buttons">
+      <button class="btn-secondary" (click)="backToDashboard()">
+        Zum Dashboard
+      </button>
+      <button class="btn-secondary" (click)="backToSelection()">
+        Andere Prüfung wählen
+      </button>
+      <button class="btn-primary" (click)="retryExam()">
+        Prüfung wiederholen
+      </button>
+    </div>
+  </div>
+</div>
+

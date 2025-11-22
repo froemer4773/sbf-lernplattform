@@ -1,0 +1,289 @@
+@use '../../../styles/variables' as *;
+
+.statistics-container {
+  min-height: 100vh;
+  background: $bg-primary;
+  padding: $spacing-lg;
+}
+
+.header {
+  margin-bottom: $spacing-xxl;
+
+  .btn-back {
+    background: $bg-tertiary;
+    color: $text-primary;
+    border: 1px solid $border-color;
+    padding: $spacing-sm $spacing-lg;
+    border-radius: $btn-border-radius;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-bottom: $spacing-lg;
+    transition: all 0.3s;
+
+    &:hover {
+      background: $bg-active;
+      border-color: $accent-primary;
+    }
+  }
+
+  h1 {
+    color: $text-primary;
+    font-size: 2rem;
+    margin: 0;
+  }
+}
+
+// ===== LOADING & ERROR =====
+
+.loading-state,
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  color: $text-primary;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid $border-color;
+  border-top-color: $accent-primary;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: $spacing-lg;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-message {
+  font-size: 1.1rem;
+  margin-bottom: $spacing-lg;
+  color: $error-color;
+}
+
+.btn-retry {
+  background: $accent-primary;
+  color: $bg-primary;
+  border: none;
+  padding: $spacing-md $spacing-xl;
+  border-radius: $btn-border-radius;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+
+  &:hover {
+    background: $accent-primary-hover;
+  }
+}
+
+// ===== STATISTIK ÜBERSICHT =====
+
+.stats-overview {
+  margin-bottom: $spacing-xxl;
+
+  h2 {
+    color: $text-primary;
+    margin-bottom: $spacing-xl;
+  }
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: $spacing-lg;
+}
+
+.stat-card {
+  background: $bg-card;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-lg;
+  padding: $spacing-xl;
+  text-align: center;
+  transition: all 0.3s;
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: $accent-primary;
+  }
+
+  &.success {
+    border-color: $success-color;
+  }
+
+  &.highlight {
+    border-color: $warning-color;
+  }
+
+  .stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: $spacing-md;
+  }
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: $accent-primary;
+    margin-bottom: $spacing-sm;
+  }
+
+  .stat-label {
+    color: $text-secondary;
+    font-size: 0.9rem;
+  }
+}
+
+// ===== PRÜFUNGSERGEBNISSE =====
+
+.exam-results {
+  h2 {
+    color: $text-primary;
+    margin-bottom: $spacing-xl;
+  }
+}
+
+.empty-state {
+  background: $bg-card;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-lg;
+  padding: $spacing-xxl;
+  text-align: center;
+  color: $text-secondary;
+
+  p {
+    margin: $spacing-md 0;
+    font-size: 1.1rem;
+  }
+}
+
+.results-table {
+  background: $bg-card;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+
+    thead {
+      background: $bg-tertiary;
+
+      th {
+        padding: $spacing-lg;
+        text-align: left;
+        color: $text-primary;
+        font-weight: bold;
+        border-bottom: 2px solid $border-color;
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid $border-color;
+        transition: background 0.2s;
+
+        &:hover {
+          background: $bg-tertiary;
+        }
+
+        &.bestanden {
+          border-left: 4px solid $success-color;
+        }
+
+        &.nicht-bestanden {
+          border-left: 4px solid $error-color;
+        }
+
+        td {
+          padding: $spacing-lg;
+          color: $text-primary;
+        }
+      }
+    }
+  }
+}
+
+.result-detail {
+  .correct {
+    color: $success-color;
+    font-weight: bold;
+  }
+
+  .wrong {
+    color: $error-color;
+    font-weight: bold;
+  }
+
+  .unanswered {
+    color: $text-secondary;
+  }
+}
+
+.progress-bar {
+  position: relative;
+  width: 100%;
+  height: 24px;
+  background: $bg-tertiary;
+  border-radius: $border-radius-sm;
+  overflow: hidden;
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, $success-color, $accent-primary);
+    transition: width 0.5s ease;
+  }
+
+  .progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: $text-primary;
+    font-weight: bold;
+    font-size: 0.85rem;
+  }
+}
+
+.badge {
+  display: inline-block;
+  padding: $spacing-xs $spacing-md;
+  border-radius: $border-radius-sm;
+  font-size: 0.85rem;
+  font-weight: bold;
+
+  &.badge-success {
+    background: rgba($success-color, 0.2);
+    color: $success-light;
+    border: 1px solid $success-color;
+  }
+
+  &.badge-error {
+    background: rgba($error-color, 0.2);
+    color: $error-color;
+    border: 1px solid $error-color;
+  }
+}
+
+// ===== RESPONSIVE =====
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .results-table {
+    overflow-x: auto;
+
+    table {
+      min-width: 600px;
+    }
+  }
+
+  .header h1 {
+    font-size: 1.5rem;
+  }
+}

@@ -95,3 +95,61 @@ export interface SubmitAnswerResponse {
   korrekte_antwort: string;
   message: string;
 }
+
+// Prüfungsmodus Interfaces
+export interface ExamBogen {
+  id: number;
+  name: string;
+  beschreibung: string;
+  zeitlimit_minuten: number;
+  bestehensgrenze_prozent: number;
+  anzahl_fragen: number;
+}
+
+export interface ExamBogenDetails {
+  bogen: {
+    id: number;
+    name: string;
+    beschreibung: string;
+    zeitlimit_minuten: number;
+    bestehensgrenze_prozent: number;
+    aktiv: number;
+  };
+  fragen: ExamQuestion[];
+  anzahl_fragen: number;
+}
+
+export interface ExamQuestion {
+  reihenfolge: number;
+  id: number;
+  frage_text: string;
+  bild_url: string | null;
+  antwort_a: string;
+  antwort_b: string;
+  antwort_c: string;
+  antwort_d: string;
+  richtige_antwort: string;
+  kategorie_id: number;
+  kategorie_name: string;
+  kapitel_id: number | null;
+  kapitel_bezeichnung: string | null;
+}
+
+export interface ExamAnswer {
+  frage_id: number;
+  selected_answer: string | null; // A, B, C, D oder null wenn nicht beantwortet
+}
+
+export interface ExamResult {
+  bogen_id: number;
+  bogen_name: string;
+  anzahl_fragen: number;
+  richtige_antworten: number;
+  falsche_antworten: number;
+  nicht_beantwortet: number;
+  erfolgsquote: number;
+  bestanden: boolean;
+  zeitlimit_minuten: number;
+  bearbeitungszeit_sekunden: number;
+  antworten: ExamAnswer[];
+}

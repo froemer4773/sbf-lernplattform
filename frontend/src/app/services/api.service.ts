@@ -9,7 +9,9 @@ import {
   Progress,
   CategoryProgress,
   SubmitAnswerRequest,
-  SubmitAnswerResponse
+  SubmitAnswerResponse,
+  ExamBogen,
+  ExamBogenDetails
 } from '../models/models';
 
 @Injectable({
@@ -86,5 +88,34 @@ export class ApiService {
   deleteAccount(): Observable<any> {
     // Alternative: use account-delete.php which supports both DELETE and POST
     return this.http.delete<any>(`${this.apiUrl}/users/account.php`);
+  }
+
+  // ===== Prüfungsmodus =====
+
+  getExamBoegen(): Observable<{ success: boolean; boegen: ExamBogen[] }> {
+    return this.http.get<{ success: boolean; boegen: ExamBogen[] }>(`${this.apiUrl}/exams/boegen.php`);
+  }
+
+  getExamBogenDetails(bogenId: number): Observable<ExamBogenDetails> {
+    return this.http.get<ExamBogenDetails>(`${this.apiUrl}/exams/boegen.php?id=${bogenId}`);
+  }
+
+  saveExamResult(data: any): Observable<{ success: boolean; ergebnis_id: number; message: string }> {
+    return this.http.post<{ success: boolean; ergebnis_id: number; message: string }>(
+      `${this.apiUrl}/exams/results.php`,
+      data
+    );
+  }
+
+  getExamResults(): Observable<{ success: boolean; ergebnisse: any[]; statistik: any }> {
+    return this.http.get<{ success: boolean; ergebnisse: any[]; statistik: any }>(
+      `${this.apiUrl}/exams/results.php`
+    );
+  }
+
+  getExamResultDetail(id: number): Observable<{ success: boolean; ergebnis: any }> {
+    return this.http.get<{ success: boolean; ergebnis: any }>(
+      `${this.apiUrl}/exams/results.php?id=${id}`
+    );
   }
 }

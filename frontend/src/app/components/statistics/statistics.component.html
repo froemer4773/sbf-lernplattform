@@ -1,1 +1,119 @@
-<p>statistics works!</p>
+<div class="statistics-container">
+  <div class="header">
+    <button class="btn-back" (click)="backToDashboard()">
+      ← Zurück zum Dashboard
+    </button>
+    <h1>Meine Statistiken</h1>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Lade Statistiken...</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error && !loading) {
+    <div class="error-state">
+      <p class="error-message">{{ error }}</p>
+      <button class="btn-retry" (click)="loadExamResults()">Erneut versuchen</button>
+    </div>
+  }
+
+  <!-- Content -->
+  @if (!loading && !error) {
+    <div class="content">
+      <!-- Prüfungsstatistik Übersicht -->
+      @if (examStatistik && examStatistik.anzahl_pruefungen > 0) {
+        <section class="stats-overview">
+          <h2>Prüfungsübersicht</h2>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">📝</div>
+              <div class="stat-value">{{ examStatistik.anzahl_pruefungen }}</div>
+              <div class="stat-label">Absolvierte Prüfungen</div>
+            </div>
+
+            <div class="stat-card success">
+              <div class="stat-icon">✅</div>
+              <div class="stat-value">{{ examStatistik.bestandene_pruefungen }}</div>
+              <div class="stat-label">Bestanden</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">📊</div>
+              <div class="stat-value">{{ examStatistik.durchschnittliche_erfolgsquote }}%</div>
+              <div class="stat-label">Durchschnittliche Erfolgsquote</div>
+            </div>
+
+            <div class="stat-card highlight">
+              <div class="stat-icon">🏆</div>
+              <div class="stat-value">{{ examStatistik.beste_erfolgsquote }}%</div>
+              <div class="stat-label">Beste Erfolgsquote</div>
+            </div>
+          </div>
+        </section>
+      }
+
+      <!-- Prüfungsergebnisse Liste -->
+      <section class="exam-results">
+        <h2>Prüfungsergebnisse</h2>
+
+        @if (examResults.length === 0) {
+          <div class="empty-state">
+            <p>Du hast noch keine Prüfungen absolviert.</p>
+            <p>Starte deine erste Prüfungssimulation im Dashboard!</p>
+          </div>
+        } @else {
+          <div class="results-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Datum</th>
+                  <th>Prüfungsbogen</th>
+                  <th>Ergebnis</th>
+                  <th>Erfolgsquote</th>
+                  <th>Dauer</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (result of examResults; track result.id) {
+                  <tr [class.bestanden]="result.bestanden" [class.nicht-bestanden]="!result.bestanden">
+                    <td>{{ formatDate(result.abgeschlossen_am) }}</td>
+                    <td><strong>{{ result.bogen_name }}</strong></td>
+                    <td>
+                      <span class="result-detail">
+                        <span class="correct">{{ result.richtige_antworten }}</span> /
+                        <span class="wrong">{{ result.falsche_antworten }}</span>
+                        @if (result.nicht_beantwortet > 0) {
+                          / <span class="unanswered">{{ result.nicht_beantwortet }}</span>
+                        }
+                      </span>
+                    </td>
+                    <td>
+                      <div class="progress-bar">
+                        <div class="progress-fill" [style.width.%]="result.erfolgsquote"></div>
+                        <span class="progress-text">{{ result.erfolgsquote }}%</span>
+                      </div>
+                    </td>
+                    <td>{{ formatDuration(result.bearbeitungszeit_sekunden) }}</td>
+                    <td>
+                      @if (result.bestanden) {
+                        <span class="badge badge-success">Bestanden ✓</span>
+                      } @else {
+                        <span class="badge badge-error">Nicht bestanden</span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    </div>
+  }
+</div>

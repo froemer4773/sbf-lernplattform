@@ -1,1 +1,166 @@
-<p>exam-mode works!</p>
+<div class="exam-container">
+  <!-- LOADING STATE -->
+  @if (loading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Lade Prüfung...</p>
+    </div>
+  }
+
+  <!-- ERROR STATE -->
+  @else if (error) {
+    <div class="error-state">
+      <p class="error-message">{{ error }}</p>
+      <button class="btn-retry" (click)="goBack()">Zurück</button>
+    </div>
+  }
+
+  <!-- BOGEN-AUSWAHL -->
+  @else if (showSelection) {
+    <header class="exam-header">
+      <div class="header-top">
+        <button class="btn-back" (click)="goBack()">
+          ← Zurück zum Dashboard
+        </button>
+      </div>
+      <h1>Prüfungssimulation</h1>
+      <p class="subtitle">Wähle einen Prüfungsbogen aus</p>
+    </header>
+
+    <main class="exam-main">
+      @if (boegen.length === 0) {
+        <div class="empty-state">
+          <p>Keine Prüfungsbögen verfügbar.</p>
+        </div>
+      } @else {
+        <div class="boegen-grid">
+          @for (bogen of boegen; track bogen.id) {
+            <div class="bogen-card" (click)="selectBogen(bogen)">
+              <div class="bogen-header">
+                <h3>{{ bogen.name }}</h3>
+                <div class="bogen-badge">
+                  {{ bogen.anzahl_fragen }} Fragen
+                </div>
+              </div>
+
+              <p class="bogen-description">{{ bogen.beschreibung }}</p>
+
+              <div class="bogen-meta">
+                <div class="meta-item">
+                  <span class="meta-icon">⏱️</span>
+                  <span>{{ bogen.zeitlimit_minuten }} Minuten</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-icon">✓</span>
+                  <span>{{ bogen.bestehensgrenze_prozent }}% zum Bestehen</span>
+                </div>
+              </div>
+
+              <button class="btn-start">Prüfung starten</button>
+            </div>
+          }
+        </div>
+      }
+    </main>
+  }
+
+  <!-- PRÜFUNGS-DURCHFÜHRUNG -->
+  @else if (bogenDetails && currentQuestion) {
+    <!-- Header mit Timer -->
+    <header class="exam-header-active">
+      <div class="header-left">
+        <button class="btn-back-small" (click)="goBack()">← Abbrechen</button>
+        <h2>{{ bogenDetails.bogen.name }}</h2>
+      </div>
+      <div class="timer" [class.warning]="timerWarning">
+        ⏱️ {{ timerDisplay }}
+      </div>
+    </header>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="progress"></div>
+      <span class="progress-text">
+        Frage {{ currentQuestionIndex + 1 }} von {{ bogenDetails.fragen.length }}
+        ({{ answeredCount }} beantwortet)
+      </span>
+    </div>
+
+    <!-- Fragenbereich -->
+    <main class="question-area">
+      <div class="question-card">
+        <div class="question-header">
+          <span class="question-number">Frage {{ currentQuestionIndex + 1 }}</span>
+          @if (currentQuestion.kategorie_name) {
+            <span class="question-category">{{ currentQuestion.kategorie_name }}</span>
+          }
+        </div>
+
+        <div class="question-text">
+          {{ currentQuestion.frage_text }}
+        </div>
+
+        @if (currentQuestion.bild_url) {
+          <div class="question-image">
+            <img [src]="getQuestionImageUrl(currentQuestion.id)" [alt]="'Bild zu Frage ' + currentQuestion.id">
+          </div>
+        }
+
+        <div class="answers-grid">
+          @for (answer of currentShuffledAnswers; track answer.buchstabe) {
+            <div
+              class="answer-option"
+              [class.selected]="isAnswerSelected(answer.buchstabe)"
+              (click)="selectAnswer(answer.buchstabe)">
+              <span class="answer-text">{{ answer.text }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Navigation Buttons -->
+      <div class="navigation-buttons">
+        <button
+          class="btn-nav btn-previous"
+          [disabled]="currentQuestionIndex === 0"
+          (click)="previousQuestion()">
+          ← Vorherige
+        </button>
+
+        @if (currentQuestionIndex < bogenDetails.fragen.length - 1) {
+          <button
+            class="btn-nav btn-next"
+            [disabled]="!isCurrentQuestionAnswered()"
+            (click)="nextQuestion()">
+            Nächste →
+          </button>
+        } @else {
+          <button
+            class="btn-submit"
+            [disabled]="!isCurrentQuestionAnswered()"
+            (click)="submitExam()">
+            Prüfung abgeben
+          </button>
+        }
+      </div>
+    </main>
+  }
+
+  <!-- Warnung: Nicht alle Fragen beantwortet -->
+  @if (showWarning) {
+    <div class="modal-overlay" (click)="cancelWarning()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <h3>⚠️ Nicht alle Fragen beantwortet</h3>
+        <p>Du hast noch nicht alle Fragen beantwortet.</p>
+        <p><strong>{{ answeredCount }} von {{ bogenDetails!.fragen.length }} Fragen beantwortet</strong></p>
+        <p>Möchtest du die Prüfung trotzdem abgeben?</p>
+
+        <div class="modal-buttons">
+          <button class="btn-cancel" (click)="cancelWarning()">Abbrechen</button>
+          <button class="btn-confirm" (click)="submitExam()">Trotzdem abgeben</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+

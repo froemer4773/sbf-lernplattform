@@ -143,7 +143,7 @@
         Das Löschen deines Accounts ist <strong>unwiderruflich</strong>. Alle deine Daten,
         einschließlich deines Lernfortschritts, werden dauerhaft gelöscht.
       </p>
-      <button type="button" class="btn-delete" (click)="deleteAccount()" [disabled]="isDeleting">
+      <button type="button" class="btn-primary" (click)="deleteAccount()" [disabled]="isDeleting">
         <span *ngIf="!isDeleting">Account unwiderruflich löschen</span>
         <span *ngIf="isDeleting">Wird gelöscht...</span>
       </button>

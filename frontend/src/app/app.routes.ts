@@ -44,8 +44,20 @@ export const routes: Routes = [
   },
   {
     path: 'exam',
-    loadComponent: () => import('./components/exam/exam-mode/exam-mode.component').then(m => m.ExamModeComponent),
-    canActivate: [authGuard]
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./components/exam/exam-mode/exam-mode.component').then(m => m.ExamModeComponent)
+      },
+      {
+        path: 'bogen/:id',
+        loadComponent: () => import('./components/exam/exam-mode/exam-mode.component').then(m => m.ExamModeComponent)
+      },
+      {
+        path: 'result',
+        loadComponent: () => import('./components/exam/exam-result/exam-result.component').then(m => m.ExamResultComponent)
+      }
+    ]
   },
   {
     path: 'statistics',

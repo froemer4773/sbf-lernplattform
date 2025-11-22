@@ -1,0 +1,353 @@
+@use '../../../../styles/variables' as *;
+
+.result-container {
+  min-height: 100vh;
+  background: $bg-primary;
+  padding: $spacing-xl;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.result-card {
+  background: $bg-card;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-lg;
+  max-width: 900px;
+  width: 100%;
+  overflow: hidden;
+}
+
+// ===== HEADER =====
+
+.result-header {
+  padding: $spacing-xxl;
+  text-align: center;
+  color: $text-primary;
+
+  &.passed {
+    background: $bg-tertiary;
+    border-bottom: 3px solid $success-color;
+  }
+
+  &.failed {
+    background: $bg-tertiary;
+    border-bottom: 3px solid $error-color;
+  }
+
+  .result-icon {
+    font-size: 4rem;
+    margin-bottom: $spacing-md;
+
+    &.passed {
+      color: $success-color;
+    }
+
+    &.failed {
+      color: $error-color;
+    }
+  }
+
+  h1 {
+    margin: 0 0 $spacing-sm 0;
+    font-size: 2.5rem;
+  }
+
+  .result-subtitle {
+    margin: 0;
+    font-size: 1.2rem;
+    color: $text-secondary;
+  }
+}
+
+// ===== STATISTIK =====
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: $spacing-lg;
+  padding: $spacing-xxl;
+  border-bottom: 1px solid $border-color;
+
+  .stat-item {
+    text-align: center;
+    padding: $spacing-lg;
+    background: $bg-tertiary;
+    border: 1px solid $border-color;
+    border-radius: $border-radius-lg;
+    transition: all 0.3s;
+
+    &:hover {
+      transform: translateY(-3px);
+      border-color: $accent-primary;
+    }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-bottom: $spacing-xs;
+    }
+
+    .stat-label {
+      font-size: 0.95rem;
+      color: $text-secondary;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    &.stat-success {
+      .stat-value { color: $success-color; }
+    }
+
+    &.stat-error {
+      .stat-value { color: $error-color; }
+    }
+
+    &.stat-neutral {
+      .stat-value { color: $text-secondary; }
+    }
+
+    &.stat-primary {
+      .stat-value { color: $accent-primary; }
+    }
+  }
+}
+
+// ===== INFO =====
+
+.info-section {
+  padding: $spacing-xxl;
+  border-bottom: 1px solid $border-color;
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: $spacing-md 0;
+    border-bottom: 1px solid $border-color;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      color: $text-secondary;
+      font-weight: 500;
+    }
+
+    .info-value {
+      color: $text-primary;
+      font-weight: bold;
+    }
+  }
+}
+
+// ===== DETAILS =====
+
+.details-toggle {
+  padding: $spacing-lg $spacing-xxl;
+  text-align: center;
+  border-bottom: 1px solid $border-color;
+
+  .btn-toggle {
+    background: $bg-tertiary;
+    border: 2px solid $border-color;
+    color: $text-primary;
+    padding: $spacing-md $spacing-xl;
+    border-radius: $btn-border-radius;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &:hover {
+      background: $bg-active;
+      border-color: $accent-primary;
+      color: $accent-primary;
+    }
+  }
+}
+
+.details-section {
+  padding: $spacing-xxl;
+  max-height: 600px;
+  overflow-y: auto;
+
+  h3 {
+    margin-top: 0;
+    margin-bottom: $spacing-xl;
+    color: $text-primary;
+  }
+
+  .question-result {
+    background: $bg-tertiary;
+    border-left: 4px solid $border-color;
+    border: 1px solid $border-color;
+    padding: $spacing-lg;
+    margin-bottom: $spacing-lg;
+    border-radius: $border-radius-md;
+
+    &.correct {
+      border-left: 4px solid $success-color;
+    }
+
+    &.incorrect {
+      border-left: 4px solid $error-color;
+    }
+
+    &.unanswered {
+      border-left: 4px solid $text-secondary;
+    }
+
+    .question-result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: $spacing-md;
+
+      .question-num {
+        font-weight: bold;
+        color: $accent-primary;
+      }
+
+      .result-badge {
+        padding: $spacing-xs $spacing-md;
+        border-radius: $border-radius-md;
+        font-size: 0.9rem;
+        font-weight: bold;
+      }
+    }
+
+    &.correct .result-badge {
+      background: $success-color;
+      color: white;
+    }
+
+    &.incorrect .result-badge {
+      background: $error-color;
+      color: white;
+    }
+
+    &.unanswered .result-badge {
+      background: $text-secondary;
+      color: white;
+    }
+
+    .question-text {
+      color: $text-primary;
+      margin-bottom: $spacing-md;
+      font-size: 1.05rem;
+      line-height: 1.6;
+    }
+
+    .answers-comparison {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-sm;
+
+      .answer-info {
+        font-size: 0.95rem;
+
+        strong {
+          color: $text-secondary;
+        }
+
+        .wrong {
+          color: $error-color;
+          font-weight: 500;
+        }
+
+        .correct {
+          color: $success-color;
+          font-weight: 500;
+        }
+
+        &.correct-answer {
+          padding-top: $spacing-sm;
+          border-top: 1px solid $border-color;
+        }
+      }
+    }
+  }
+}
+
+// ===== ACTIONS =====
+
+.action-buttons {
+  display: flex;
+  gap: $spacing-md;
+  padding: $spacing-xxl;
+  justify-content: center;
+
+  button {
+    padding: $spacing-md $spacing-xl;
+    border: none;
+    border-radius: $btn-border-radius;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-primary {
+    background: $accent-primary;
+    color: $bg-primary;
+
+    &:hover {
+      background: $accent-primary-hover;
+      transform: translateY(-2px);
+    }
+  }
+
+  .btn-secondary {
+    background: $bg-tertiary;
+    color: $text-primary;
+    border: 2px solid $border-color;
+
+    &:hover {
+      background: $bg-active;
+      border-color: $accent-primary;
+    }
+  }
+}
+
+// ===== RESPONSIVE =====
+
+@media (max-width: 768px) {
+  .result-container {
+    padding: $spacing-md;
+  }
+
+  .result-header {
+    padding: $spacing-xl;
+
+    h1 {
+      font-size: 2rem;
+    }
+
+    .result-icon {
+      font-size: 3rem;
+    }
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    padding: $spacing-lg;
+  }
+
+  .info-section {
+    padding: $spacing-lg;
+  }
+
+  .details-section {
+    padding: $spacing-lg;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    padding: $spacing-lg;
+
+    button {
+      width: 100%;
+    }
+  }
+}

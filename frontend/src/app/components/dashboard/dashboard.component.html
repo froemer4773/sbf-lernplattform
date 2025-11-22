@@ -52,16 +52,18 @@
         <button class="btn-card">Prüfung starten</button>
       </div>
 
-      <div class="card card-stats" (click)="viewStatistics()">
-        <div class="card-icon">
-          <div class="icon-circle icon-stats-bg">
-            <span class="icon-text">S</span>
+      @if (user) {
+        <div class="card card-stats" (click)="viewStatistics()">
+          <div class="card-icon">
+            <div class="icon-circle icon-stats-bg">
+              <span class="icon-text">S</span>
+            </div>
           </div>
+          <h3>Statistiken</h3>
+          <p>Verfolge deinen Fortschritt</p>
+          <button class="btn-card">Statistiken ansehen</button>
         </div>
-        <h3>Statistiken</h3>
-        <p>Verfolge deinen Fortschritt</p>
-        <button class="btn-card">Statistiken ansehen</button>
-      </div>
+      }
     </div>
   </main>
 </div>
