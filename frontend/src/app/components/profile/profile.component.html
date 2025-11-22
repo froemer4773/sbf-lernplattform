@@ -27,6 +27,7 @@
         <div class="form-group">
           <label for="vorname">Vorname</label>
           <input
+            type="text"
             id="vorname"
             name="vorname"
             [(ngModel)]="vorname"
@@ -39,6 +40,7 @@
         <div class="form-group">
           <label for="nachname">Nachname</label>
           <input
+            type="text"
             id="nachname"
             name="nachname"
             [(ngModel)]="nachname"
@@ -133,5 +135,18 @@
         <span *ngIf="isSaving">Wird gespeichert...</span>
       </button>
     </form>
+
+    <!-- Danger Zone -->
+    <div class="danger-zone">
+      <h2>Gefahrenbereich</h2>
+      <p class="danger-description">
+        Das Löschen deines Accounts ist <strong>unwiderruflich</strong>. Alle deine Daten,
+        einschließlich deines Lernfortschritts, werden dauerhaft gelöscht.
+      </p>
+      <button type="button" class="btn-delete" (click)="deleteAccount()" [disabled]="isDeleting">
+        <span *ngIf="!isDeleting">Account unwiderruflich löschen</span>
+        <span *ngIf="isDeleting">Wird gelöscht...</span>
+      </button>
+    </div>
   </div>
 </div>

@@ -4,9 +4,6 @@
       <h1>SBF-Lernplattform</h1>
       <div class="user-info">
         @if (user) {
-          <span class="user-greeting" (click)="goToProfile()">
-            Hallo, <strong>{{ user.vorname }}</strong>!
-          </span>
           <div class="action-buttons">
             <button (click)="goToProfile()" class="btn-profile">Profil</button>
             <button (click)="logout()" class="btn-logout">Abmelden</button>

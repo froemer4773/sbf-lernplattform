@@ -124,19 +124,7 @@
     input[type="email"],
     input[type="password"],
     select {
-      width: 100%;
-      padding: $spacing-md;
-      background-color: $input-background;
-      border: 1px solid $border-color;
-      border-radius: $border-radius-md;
-      color: $text-primary;
-      font-size: $font-size-base;
-      transition: border-color $transition-normal;
-
-      &:focus {
-        outline: none;
-        border-color: $accent-primary;
-      }
+      @include input-base;
 
       &:disabled {
         opacity: 0.6;
@@ -213,6 +201,58 @@
     &:disabled {
       opacity: 0.6;
       cursor: not-allowed;
+    }
+  }
+
+  .danger-zone {
+    margin-top: $spacing-xxl;
+    padding: $spacing-xl;
+    border: 2px solid $error-color;
+    border-radius: $border-radius-md;
+    background-color: rgba($error-color, 0.05);
+
+    h2 {
+      @include heading('h3');
+      color: $error-color;
+      margin-bottom: $spacing-sm;
+      font-weight: $font-weight-bold;
+    }
+
+    .danger-description {
+      color: $text-secondary;
+      font-size: $font-size-small;
+      margin-bottom: $spacing-lg;
+      line-height: 1.6;
+
+      strong {
+        color: $error-color;
+        font-weight: $font-weight-bold;
+      }
+    }
+
+    .btn-delete {
+      width: 100%;
+      padding: $spacing-md $spacing-lg;
+      background-color: $error-color;
+      color: $bg-primary;
+      border: 2px solid $error-color;
+      border-radius: $border-radius-md;
+      font-size: $font-size-base;
+      font-weight: $font-weight-bold;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all $transition-normal;
+
+      &:hover:not(:disabled) {
+        background-color: $error-dark;
+        border-color: $error-dark;
+        transform: translateY(-1px);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
     }
   }
 }

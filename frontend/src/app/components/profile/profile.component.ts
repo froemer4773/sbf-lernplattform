@@ -27,6 +27,7 @@ export class ProfileComponent implements OnInit {
   licenses: string[] = [];
   isLoading: boolean = false;
   isSaving: boolean = false;
+  isDeleting: boolean = false;
   errorMessage: string = '';
   successMessage: string = '';
   passwordError: string = '';
@@ -133,6 +134,45 @@ export class ProfileComponent implements OnInit {
         console.error('Profile update error:', err);
         this.errorMessage = err?.error?.message || 'Aktualisierung fehlgeschlagen';
         this.isSaving = false;
+      }
+    });
+  }
+
+  deleteAccount(): void {
+    const confirmed = confirm(
+      'ACHTUNG: Möchtest du deinen Account wirklich unwiderruflich löschen?\n\n' +
+      'Alle deine Daten und dein gesamter Lernfortschritt werden dauerhaft gelöscht.\n\n' +
+      'Diese Aktion kann NICHT rückgängig gemacht werden!'
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    // Double confirmation
+    const doubleConfirmed = confirm(
+      'Letzte Bestätigung:\n\n' +
+      'Bist du dir absolut sicher? Dein Account wird JETZT gelöscht.'
+    );
+
+    if (!doubleConfirmed) {
+      return;
+    }
+
+    this.isDeleting = true;
+    this.errorMessage = '';
+
+    this.apiService.deleteAccount().subscribe({
+      next: () => {
+        // Logout and redirect
+        this.authService.logout();
+        alert('Dein Account wurde erfolgreich gelöscht.');
+        this.router.navigate(['/']);
+      },
+      error: (err) => {
+        console.error('Account deletion error:', err);
+        this.errorMessage = err?.error?.message || 'Löschen fehlgeschlagen. Bitte versuche es später erneut.';
+        this.isDeleting = false;
       }
     });
   }

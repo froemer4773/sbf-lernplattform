@@ -82,4 +82,8 @@ export class ApiService {
   updateProfile(data: any): Observable<any> {
     return this.http.put<any>(`${this.apiUrl}/users/profile/`, data);
   }
+
+  deleteAccount(): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/users/account/`);
+  }
 }
