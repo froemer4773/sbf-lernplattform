@@ -5,6 +5,7 @@
 .angular
 .github
 /*.ps1
+
 # Compiled output
 /dist
 /tmp

@@ -73,12 +73,38 @@
       @include text-small;
     }
 
-    .submit-btn {
-      @include button-variant($accent-primary);
+    .btn-primary {
       width: 100%;
+      padding: $spacing-md $spacing-lg;
       margin-top: $spacing-md;
+      background: linear-gradient(135deg, $accent-primary 0%, darken($accent-primary, 8%) 100%);
+      color: white;
+      border: none;
+      border-radius: $border-radius-md;
       font-size: $font-size-large;
-      padding: $spacing-md;
+      font-weight: $font-weight-bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all $transition-normal;
+      box-shadow: 0 4px 12px rgba($accent-primary, 0.3);
+
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba($accent-primary, 0.4);
+        background: linear-gradient(135deg, lighten($accent-primary, 5%) 0%, $accent-primary 100%);
+      }
+
+      &:active:not(:disabled) {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba($accent-primary, 0.3);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
     }
 
     .register-link {

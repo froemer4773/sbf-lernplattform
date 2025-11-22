@@ -30,9 +30,9 @@ export class DashboardComponent implements OnInit {
       console.log('User updated:', user);
     });
   }  logout(): void {
-    if (confirm('Möchtest du dich wirklich abmelden?')) {
-      this.authService.logout();
-    }
+    this.authService.logout();
+    // Nach Logout bleiben wir auf dem Dashboard
+    this.user = null;
   }
 
   startLearning(): void {

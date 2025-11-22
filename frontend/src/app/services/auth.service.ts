@@ -41,7 +41,7 @@ export class AuthService {
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
     this.currentUserSubject.next(null);
-    this.router.navigate(['/login']);
+    this.router.navigate(['/dashboard']);
   }
 
   isAuthenticated(): boolean {
@@ -67,7 +67,7 @@ export class AuthService {
   private loadUserFromStorage(): void {
     const token = this.getToken();
     const userStr = localStorage.getItem('user');
-    
+
     if (token && userStr) {
       try {
         const user = JSON.parse(userStr);

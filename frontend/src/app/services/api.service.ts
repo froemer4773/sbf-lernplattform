@@ -80,10 +80,11 @@ export class ApiService {
   }
 
   updateProfile(data: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/users/profile/`, data);
+    return this.http.put<any>(`${this.apiUrl}/users/profile.php`, data);
   }
 
   deleteAccount(): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/users/account/`);
+    // Alternative: use account-delete.php which supports both DELETE and POST
+    return this.http.delete<any>(`${this.apiUrl}/users/account.php`);
   }
 }
