@@ -1,4 +1,13 @@
 <div class="question-view-container">
+  <!-- Gast-Modus Hinweis -->
+  @if (!isAuthenticated()) {
+    <div class="guest-notice">
+      <span class="icon">ℹ️</span>
+      <span class="text">Sie lernen im Gast-Modus. <strong>Registrieren Sie sich</strong>, um Ihren Lernfortschritt, falsche Fragen und Zeiten zu speichern!</span>
+      <button class="register-btn" (click)="goToRegister()">Jetzt registrieren</button>
+    </div>
+  }
+
   @if (error(); as errorMsg) {
     <div class="error-message">
       {{ errorMsg }}

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -8,6 +8,8 @@ import { RouterLink } from '@angular/router';
   templateUrl: './impressum.component.html',
   styleUrl: './impressum.component.scss'
 })
-export class ImpressumComponent {
-
+export class ImpressumComponent implements OnInit {
+  ngOnInit(): void {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
 }

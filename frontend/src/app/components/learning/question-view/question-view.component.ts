@@ -52,6 +52,10 @@ export class QuestionViewComponent {
     return { current, total, percentage: total > 0 ? (current / total) * 100 : 0 };
   });
 
+  isAuthenticated = computed(() => {
+    return !!this.authService.getToken();
+  });
+
   constructor(
     public apiService: ApiService,
     private authService: AuthService,
@@ -140,6 +144,14 @@ export class QuestionViewComponent {
           filteredQuestions = data.filter(q => q.unterkategorie === unterkategorie);
         }
 
+        // Check user setting for random question order
+        const currentUser = this.authService.getCurrentUser();
+        const randomOrder = currentUser?.settings?.random_question_order || false;
+
+        if (randomOrder) {
+          filteredQuestions = this.shuffleArray(filteredQuestions);
+        }
+
         this.questions.set(filteredQuestions);
         this.currentQuestionIndex.set(0);
 
@@ -161,7 +173,6 @@ export class QuestionViewComponent {
 
         // Try to create a session record on the backend (best-effort).
         // Expecting backend to accept POST /progress/session/ { action: 'start' } -> { session_id }
-        const currentUser = this.authService.getCurrentUser();
         const payload: any = {
           user_id: currentUser ? currentUser.id : null,
           session_type: 'kategorie',
@@ -212,6 +223,8 @@ export class QuestionViewComponent {
       this.revealed.set(false);
       // reset question timer for the new question
       this.questionStart = Date.now();
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
@@ -222,6 +235,8 @@ export class QuestionViewComponent {
       this.revealed.set(false);
       // reset question timer when navigating
       this.questionStart = Date.now();
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
@@ -254,16 +269,49 @@ export class QuestionViewComponent {
     };
 
     const token = this.authService.getToken();
-    console.log('Submitting answer; auth token present?', !!token);
-    // for debugging: print a short prefix (don't leak full token in logs long-term)
-    if (token) console.log('Token prefix:', token.substring(0, 12) + '...');
+    const isGuest = !token;
 
-    if (!token) {
-      alert('Nicht angemeldet. Bitte einloggen.');
-      this.router.navigate(['/login']);
+    // Gast-Modus: Lokale Validierung ohne Backend
+    if (isGuest) {
+      const isCorrect = selectedAnswer === question.korrekte_antwort;
+
+      // Speichere Ergebnis lokal
+      const currentResults = this.answerResults();
+      currentResults.push({
+        frage_id: question.frage_id,
+        frage_text: question.frage_text,
+        selected_answer: selectedAnswer!,
+        correct_answer: question.korrekte_antwort,
+        is_correct: isCorrect
+      });
+      this.answerResults.set(currentResults);
+
+      console.log('answerResults nach submit (Gast-Modus):', this.answerResults().length, 'von', this.questions().length);
+
+      // Track if answer was incorrect
+      if (!isCorrect && question) {
+        const newIncorrect = new Set(this.incorrectAnswers());
+        newIncorrect.add(question.frage_id);
+        this.incorrectAnswers.set(newIncorrect);
+      }
+
+      this.totalSessionSeconds += timeTakenSeconds;
+      this.answeredCount++;
+
+      const totalQuestions = this.questions().length;
+      const allAnswered = this.answeredCount >= totalQuestions;
+
+      if (allAnswered) {
+        console.log('All questions answered (Gast-Modus). Navigating to results.');
+        this.showResults();
+      } else {
+        this.nextQuestion();
+      }
+
       return;
     }
 
+    // Angemeldeter Benutzer: Backend-Validierung
     this.apiService.submitAnswer(request).subscribe({
       next: (response) => {
         console.log('Antwort eingereicht:', response);
@@ -350,6 +398,33 @@ export class QuestionViewComponent {
     // Finde die richtige Antwort (ist_korrekt ist eine Zahl: 1 = richtig)
     const correctAnswer = question.antworten.find(a => a.ist_korrekt === 1);
     if (correctAnswer) {
+      const token = this.authService.getToken();
+      const isGuest = !token;
+
+      // Gast-Modus: Lokal speichern
+      if (isGuest) {
+        // Speichere Ergebnis
+        const currentResults = this.answerResults();
+        currentResults.push({
+          frage_id: question.frage_id,
+          frage_text: question.frage_text,
+          selected_answer: 'Aufgedeckt',
+          correct_answer: question.korrekte_antwort,
+          is_correct: false
+        });
+        this.answerResults.set(currentResults);
+
+        // Als falsch markieren
+        const newIncorrect = new Set(this.incorrectAnswers());
+        newIncorrect.add(question.frage_id);
+        this.incorrectAnswers.set(newIncorrect);
+
+        this.totalSessionSeconds += timeTakenSeconds;
+        this.answeredCount++;
+        return;
+      }
+
+      // Angemeldeter Benutzer: Backend
       const request: SubmitAnswerRequest = {
         frage_id: question.frage_id,
         selected_answer: correctAnswer.buchstabe,
@@ -400,6 +475,10 @@ export class QuestionViewComponent {
         unterkategorie: this.unterkategorie()
       }
     });
+  }
+
+  goToRegister() {
+    this.router.navigate(['/register']);
   }
 
   private shuffleArray<T>(array: T[]): T[] {

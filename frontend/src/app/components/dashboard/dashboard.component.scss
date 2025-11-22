@@ -32,9 +32,53 @@
       .user-greeting {
         color: $text-primary;
         font-weight: $font-weight-medium;
+        cursor: pointer;
+        transition: color $transition-normal;
+
+        &:hover {
+          color: $accent-primary;
+        }
 
         strong {
           color: $accent-primary;
+        }
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: $spacing-sm;
+      }
+
+      .btn-login,
+      .btn-register,
+      .btn-profile {
+        padding: $spacing-sm $spacing-lg;
+        border-radius: $border-radius-md;
+        font-size: $font-size-small;
+        font-weight: $font-weight-medium;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all $transition-normal;
+        border: none;
+      }
+
+      .btn-login,
+      .btn-profile {
+        background-color: transparent;
+        border: 1px solid $primary-color;
+        color: $primary-color;
+
+        &:hover {
+          background-color: rgba($primary-color, 0.1);
+        }
+      }
+
+      .btn-register {
+        background-color: $primary-color;
+        color: $bg-primary;
+
+        &:hover {
+          background-color: lighten($primary-color, 10%);
         }
       }
 
@@ -78,6 +122,10 @@
       @include text-body;
       color: $text-secondary;
       font-size: $font-size-large;
+
+      strong {
+        color: $primary-color;
+      }
     }
   }
 

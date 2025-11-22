@@ -7,6 +7,11 @@
   preferred_schein: string;
   created_at?: string;
   last_login?: string;
+  settings?: UserSettings;
+}
+
+export interface UserSettings {
+  random_question_order?: boolean;
 }
 
 export interface License {

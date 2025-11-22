@@ -1,1 +1,137 @@
-<p>profile works!</p>
+<div class="profile-container">
+  <div class="back-link">
+    <a (click)="goBack()">← Zurück</a>
+  </div>
+
+  <div class="profile-card">
+    <div class="logo-section">
+      <h1>Mein Profil</h1>
+      <p>Verwalte deine persönlichen Daten und Einstellungen</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="profile-form">
+      <!-- Success Message -->
+      <div class="success-message" *ngIf="successMessage">
+        {{ successMessage }}
+      </div>
+
+      <!-- Error Message -->
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Personal Data Section -->
+      <div class="form-section">
+        <h2>Persönliche Daten</h2>
+
+        <div class="form-group">
+          <label for="vorname">Vorname</label>
+          <input
+            id="vorname"
+            name="vorname"
+            [(ngModel)]="vorname"
+            [disabled]="isSaving"
+            placeholder="Vorname"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="nachname">Nachname</label>
+          <input
+            id="nachname"
+            name="nachname"
+            [(ngModel)]="nachname"
+            [disabled]="isSaving"
+            placeholder="Nachname"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="email">E-Mail</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            [(ngModel)]="email"
+            [disabled]="isSaving"
+            placeholder="deine@email.de"
+            required
+          />
+        </div>
+
+        <div class="form-group" *ngIf="licenses.length">
+          <label for="preferred">Bevorzugter Schein</label>
+          <select
+            id="preferred"
+            name="preferred"
+            [(ngModel)]="preferredSchein"
+            [disabled]="isSaving"
+          >
+            <option *ngFor="let l of licenses" [value]="l">{{ l }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Password Change Section -->
+      <div class="form-section">
+        <h2>Passwort ändern (optional)</h2>
+        <p class="section-description">Lasse die Felder leer, wenn du dein Passwort nicht ändern möchtest.</p>
+
+        <div class="form-group">
+          <label for="newPassword">Neues Passwort</label>
+          <input
+            type="password"
+            id="newPassword"
+            name="newPassword"
+            [(ngModel)]="newPassword"
+            [disabled]="isSaving"
+            placeholder="Neues Passwort"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Passwort bestätigen</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            [(ngModel)]="confirmPassword"
+            [disabled]="isSaving"
+            placeholder="Passwort wiederholen"
+          />
+          <div class="field-error" *ngIf="passwordError">{{ passwordError }}</div>
+        </div>
+      </div>
+
+      <!-- Settings Section -->
+      <div class="form-section">
+        <h2>Einstellungen</h2>
+
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              id="randomQuestionOrder"
+              name="randomQuestionOrder"
+              [(ngModel)]="randomQuestionOrder"
+              [disabled]="isSaving"
+            />
+            <span>Fragen in zufälliger Reihenfolge anzeigen</span>
+          </label>
+          <p class="field-description">
+            Wenn aktiviert, werden die Fragen bei jedem Lernen in zufälliger Reihenfolge angezeigt.
+            Andernfalls erscheinen sie in der Reihenfolge der Datenbank.
+          </p>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="btn-primary" [disabled]="isSaving">
+        <span *ngIf="!isSaving">Änderungen speichern</span>
+        <span *ngIf="isSaving">Wird gespeichert...</span>
+      </button>
+    </form>
+  </div>
+</div>

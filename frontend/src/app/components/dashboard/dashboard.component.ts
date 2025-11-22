@@ -20,14 +20,16 @@ export class DashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Lade User aus Service
+    // Lade User direkt aus Service
+    this.user = this.authService.getCurrentUser();
+    console.log('Current User:', this.user); // Debug
+
+    // Subscribe für Updates
     this.authService.currentUser$.subscribe(user => {
       this.user = user;
-      console.log('Current User:', user); // Debug
+      console.log('User updated:', user);
     });
-  }
-
-  logout(): void {
+  }  logout(): void {
     if (confirm('Möchtest du dich wirklich abmelden?')) {
       this.authService.logout();
     }
@@ -43,5 +45,17 @@ export class DashboardComponent implements OnInit {
 
   viewStatistics(): void {
     this.router.navigate(['/statistics/learning-time']);
+  }
+
+  goToLogin(): void {
+    this.router.navigate(['/login']);
+  }
+
+  goToRegister(): void {
+    this.router.navigate(['/register']);
+  }
+
+  goToProfile(): void {
+    this.router.navigate(['/profile']);
   }
 }

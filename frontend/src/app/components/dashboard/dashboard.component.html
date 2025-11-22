@@ -3,21 +3,33 @@
     <div class="header-content">
       <h1>SBF-Lernplattform</h1>
       <div class="user-info">
-        <span class="user-greeting" *ngIf="user">
-          Hallo, <strong>{{ user.vorname }}</strong>!
-        </span>
-        <span class="user-greeting" *ngIf="!user">
-          Hallo!
-        </span>
-        <button (click)="logout()" class="btn-logout">Abmelden</button>
+        @if (user) {
+          <span class="user-greeting" (click)="goToProfile()">
+            Hallo, <strong>{{ user.vorname }}</strong>!
+          </span>
+          <div class="action-buttons">
+            <button (click)="goToProfile()" class="btn-profile">Profil</button>
+            <button (click)="logout()" class="btn-logout">Abmelden</button>
+          </div>
+        } @else {
+          <div class="action-buttons">
+            <button (click)="goToLogin()" class="btn-login">Anmelden</button>
+            <button (click)="goToRegister()" class="btn-register">Registrieren</button>
+          </div>
+        }
       </div>
     </div>
   </header>
 
   <main class="dashboard-main">
     <div class="welcome-section">
-      <h2>Willkommen zurück<span *ngIf="user">, {{ user.vorname }}</span>!</h2>
-      <p>Wähle einen Bereich, um mit dem Lernen zu beginnen.</p>
+      @if (user) {
+        <h2>Willkommen zurück, {{ user.vorname }}!</h2>
+        <p>Wähle einen Bereich, um mit dem Lernen zu beginnen.</p>
+      } @else {
+        <h2>Willkommen zur SBF-Lernplattform!</h2>
+        <p>Du kannst ohne Registrierung lernen. <strong>Registriere dich</strong>, um deinen Fortschritt zu speichern!</p>
+      }
     </div>
 
     <div class="cards-grid">

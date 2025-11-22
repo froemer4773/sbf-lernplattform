@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -8,6 +8,8 @@ import { RouterLink } from '@angular/router';
   templateUrl: './datenschutz.component.html',
   styleUrl: './datenschutz.component.scss'
 })
-export class DatenschutzComponent {
-
+export class DatenschutzComponent implements OnInit {
+  ngOnInit(): void {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
 }

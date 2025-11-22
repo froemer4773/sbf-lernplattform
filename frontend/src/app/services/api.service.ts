@@ -78,4 +78,8 @@ export class ApiService {
     let params = new HttpParams().set('period', period);
     return this.http.get<any>(`${this.apiUrl}/progress/learning-time/`, { params });
   }
+
+  updateProfile(data: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/users/profile/`, data);
+  }
 }

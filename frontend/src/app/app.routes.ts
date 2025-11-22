@@ -17,12 +17,12 @@ export const routes: Routes = [
   },
   {
     path: 'dashboard',
-    loadComponent: () => import('./components/dashboard/dashboard.component').then(m => m.DashboardComponent),
-    canActivate: [authGuard]
+    loadComponent: () => import('./components/dashboard/dashboard.component').then(m => m.DashboardComponent)
+    // Kein authGuard - Gast-Zugriff erlaubt
   },
   {
     path: 'learning',
-    canActivate: [authGuard],
+    // Kein authGuard - Gast-Zugriff erlaubt
     children: [
       {
         path: 'category-selection',

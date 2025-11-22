@@ -6,6 +6,38 @@
   margin: 0 auto;
   padding: $spacing-xl;
 
+  .guest-notice {
+    @include card;
+    background: linear-gradient(135deg, rgba($primary-color, 0.15), rgba($primary-color, 0.05));
+    border: 1px solid rgba($primary-color, 0.3);
+    padding: $spacing-lg;
+    margin-bottom: $spacing-xl;
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+
+    .icon {
+      font-size: 1.5em;
+      flex-shrink: 0;
+    }
+
+    .text {
+      flex: 1;
+      color: $text-primary;
+      font-size: $font-size-base;
+
+      strong {
+        color: $primary-color;
+      }
+    }
+
+    .register-btn {
+      @include button-variant($primary-color);
+      padding: $spacing-sm $spacing-lg;
+      white-space: nowrap;
+    }
+  }
+
   .error-message {
     @include card;
     background-color: rgba($error-color, 0.1);
