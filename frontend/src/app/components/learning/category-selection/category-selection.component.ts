@@ -15,6 +15,7 @@ import { License, Category } from '../../../models/models';
 export class CategorySelectionComponent {
   licenses = signal<License[]>([]);
   categories = signal<Category[]>([]);
+  subcategories = signal<{kategorie: string, unterkategorie: string}[]>([]);
   selectedLicense = signal<string | null>(null);
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
@@ -91,6 +92,19 @@ export class CategorySelectionComponent {
         }));
 
         this.categories.set(categories);
+
+        // Flatten subcategories for display
+        const flatSubcategories: {kategorie: string, unterkategorie: string}[] = [];
+        categories.forEach(cat => {
+          cat.unterkategorien.forEach((sub: any) => {
+            flatSubcategories.push({
+              kategorie: cat.kategorie,
+              unterkategorie: sub.name
+            });
+          });
+        });
+        this.subcategories.set(flatSubcategories);
+
         this.loading.set(false);
       },
       error: (err) => {

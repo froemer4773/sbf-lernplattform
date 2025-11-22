@@ -34,27 +34,18 @@
         </div>
       </div>
 
-      <!-- Kategorien -->
-      @if (categories().length > 0) {
+      <!-- Unterkategorien -->
+      @if (subcategories().length > 0) {
         <div class="categories-section">
-          <h2>Kategorien für {{ selectedLicense() }}</h2>
+          <h2>Unterkategorien für {{ selectedLicense() }}</h2>
           <div class="categories-grid">
-            @for (category of categories(); track category.kategorie) {
+            @for (subcategory of subcategories(); track subcategory.kategorie + '_' + subcategory.unterkategorie) {
               <a
-                [routerLink]="['/learning/questions', selectedLicense(), category.kategorie]"
+                [routerLink]="['/learning/questions', selectedLicense(), subcategory.kategorie]"
+                [queryParams]="{unterkategorie: subcategory.unterkategorie}"
                 class="category-card"
               >
-                <h3>{{ category.kategorie }}</h3>
-                @if (category.unterkategorien && category.unterkategorien.length > 0) {
-                  <div class="subcategories">
-                    <p class="count">{{ category.unterkategorien.length }} Unterkategorien</p>
-                    <ul>
-                      @for (sub of category.unterkategorien; track sub.name) {
-                        <li>{{ sub.name }} ({{ sub.fragen_anzahl }} Fragen)</li>
-                      }
-                    </ul>
-                  </div>
-                }
+                <h3>{{ subcategory.unterkategorie }}</h3>
               </a>
             }
           </div>

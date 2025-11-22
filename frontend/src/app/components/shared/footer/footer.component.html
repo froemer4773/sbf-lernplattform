@@ -1,1 +1,12 @@
-<p>footer works!</p>
+<footer class="app-footer">
+  <div class="footer-content">
+    <div class="footer-links">
+      <a [routerLink]="['/impressum']" class="footer-link">Impressum</a>
+      <span class="separator">|</span>
+      <a [routerLink]="['/datenschutz']" class="footer-link">Datenschutz</a>
+    </div>
+    <div class="footer-copyright">
+      <p>&copy; {{ currentYear }} SBF Lernplattform. Alle Rechte vorbehalten.</p>
+    </div>
+  </div>
+</footer>

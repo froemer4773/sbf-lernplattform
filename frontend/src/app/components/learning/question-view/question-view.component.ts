@@ -27,6 +27,7 @@ export class QuestionViewComponent {
   error = signal<string | null>(null);
   schein = signal<string>('');
   kategorie = signal<string>('');
+  unterkategorie = signal<string | null>(null);
 
   currentQuestion = computed(() => {
     const questions = this.questions();
@@ -52,7 +53,13 @@ export class QuestionViewComponent {
       if (schein && kategorie) {
         this.schein.set(schein);
         this.kategorie.set(kategorie);
-        this.loadQuestions(schein, kategorie);
+
+        // Also check for unterkategorie query parameter
+        this.route.queryParams.subscribe(queryParams => {
+          const unterkategorie = queryParams['unterkategorie'];
+          this.unterkategorie.set(unterkategorie || null);
+          this.loadQuestions(schein, kategorie, unterkategorie);
+        });
       }
     });
   }
@@ -111,12 +118,18 @@ export class QuestionViewComponent {
     }
   }
 
-  loadQuestions(schein: string, kategorie: string) {
+  loadQuestions(schein: string, kategorie: string, unterkategorie?: string) {
     this.loading.set(true);
     this.error.set(null);
     this.apiService.getQuestions(schein, kategorie).subscribe({
       next: (data) => {
-        this.questions.set(data);
+        // Filter by unterkategorie if provided
+        let filteredQuestions = data;
+        if (unterkategorie) {
+          filteredQuestions = data.filter(q => q.unterkategorie === unterkategorie);
+        }
+
+        this.questions.set(filteredQuestions);
         this.currentQuestionIndex.set(0);
         // initialize session timers
         this.sessionStart = Date.now();

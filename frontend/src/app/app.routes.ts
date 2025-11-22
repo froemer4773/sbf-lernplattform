@@ -59,6 +59,14 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'impressum',
+    loadComponent: () => import('./components/legal/impressum/impressum.component').then(m => m.ImpressumComponent)
+  },
+  {
+    path: 'datenschutz',
+    loadComponent: () => import('./components/legal/datenschutz/datenschutz.component').then(m => m.DatenschutzComponent)
+  },
+  {
     path: '**',
     redirectTo: '/dashboard'
   }
