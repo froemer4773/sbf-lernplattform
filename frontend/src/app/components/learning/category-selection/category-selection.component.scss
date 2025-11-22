@@ -224,6 +224,26 @@
             }
           }
 
+          &.filter-option {
+            &.incorrect {
+              background-color: rgba($error-color, 0.1);
+              border-left: 3px solid $error-color;
+
+              .subcategory-icon {
+                background-color: rgba($error-color, 0.15);
+              }
+            }
+
+            &.bookmarked {
+              background-color: rgba($accent-primary, 0.1);
+              border-left: 3px solid $accent-primary;
+
+              .subcategory-icon {
+                background-color: rgba($accent-primary, 0.15);
+              }
+            }
+          }
+
           .subcategory-icon {
             width: 40px;
             height: 40px;

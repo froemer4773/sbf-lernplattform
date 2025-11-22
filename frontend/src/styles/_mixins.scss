@@ -191,18 +191,8 @@
   transition: color $transition-fast;
   z-index: 10;
 
-  &::before {
-    content: '←';
-    font-size: 1.25em;
-    transition: transform $transition-fast;
-  }
-
   &:hover {
     color: $back-link-hover-color;
-
-    &::before {
-      transform: translateX(-4px);
-    }
   }
 
   @media (max-width: $breakpoint-sm) {

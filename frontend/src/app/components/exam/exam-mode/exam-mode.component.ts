@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
+import { AuthService } from '../../../services/auth.service';
 import { ExamBogen, ExamBogenDetails, ExamQuestion, ExamAnswer } from '../../../models/models';
 
 @Component({
@@ -20,6 +21,7 @@ export class ExamModeComponent implements OnInit {
   bogenDetails: ExamBogenDetails | null = null;
   currentQuestionIndex = 0;
   userAnswers: Map<number, string | null> = new Map(); // frage_id -> selected answer
+  bookmarkedQuestions: Set<number> = new Set(); // Gemerkte Fragen
 
   // Timer
   timeRemaining = 0; // in Sekunden
@@ -36,6 +38,7 @@ export class ExamModeComponent implements OnInit {
 
   constructor(
     private apiService: ApiService,
+    private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
@@ -267,6 +270,51 @@ export class ExamModeComponent implements OnInit {
   get currentShuffledAnswers(): any[] {
     if (!this.currentQuestion) return [];
     return this.shuffledAnswers.get(this.currentQuestion.id) || [];
+  }
+
+  toggleBookmark(): void {
+    if (!this.currentQuestion) return;
+
+    const token = this.authService.getToken();
+    if (!token) {
+      alert('Bitte melden Sie sich an, um Fragen zu merken');
+      return;
+    }
+
+    const isBookmarked = this.bookmarkedQuestions.has(this.currentQuestion.id);
+    const newState = !isBookmarked ? 1 : 0;
+
+    // Optimistisches Update
+    if (newState === 1) {
+      this.bookmarkedQuestions.add(this.currentQuestion.id);
+    } else {
+      this.bookmarkedQuestions.delete(this.currentQuestion.id);
+    }
+
+    // Backend speichern
+    this.apiService.toggleBookmark(this.currentQuestion.id, newState).subscribe({
+      next: () => console.log('Bookmark gespeichert'),
+      error: (err) => {
+        console.error('Fehler beim Speichern:', err);
+        // Rollback
+        if (this.currentQuestion) {
+          if (newState === 1) {
+            this.bookmarkedQuestions.delete(this.currentQuestion.id);
+          } else {
+            this.bookmarkedQuestions.add(this.currentQuestion.id);
+          }
+        }
+      }
+    });
+  }
+
+  isBookmarked(): boolean {
+    if (!this.currentQuestion) return false;
+    return this.bookmarkedQuestions.has(this.currentQuestion.id);
+  }
+
+  isAuthenticated(): boolean {
+    return !!this.authService.getToken();
   }
 
   private shuffleArray<T>(array: T[]): T[] {

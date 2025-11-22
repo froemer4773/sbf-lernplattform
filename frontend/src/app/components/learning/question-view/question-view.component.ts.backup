@@ -77,15 +77,10 @@ export class QuestionViewComponent {
           const filter = queryParams['filter'];
           this.unterkategorie.set(unterkategorie || null);
           this.filter.set(filter || null);
-          this.loadQuestions(schein, kategorie, unterkategorie);
+          this.loadQuestions(schein, kategorie, unterkategorie, filter);
         });
       }
     });
-
-    // Load bookmarks if authenticated
-    if (this.authService.getToken()) {
-      this.loadBookmarks();
-    }
   }
 
   // Ensure we send session data on destroy (best-effort)
@@ -142,25 +137,9 @@ export class QuestionViewComponent {
     }
   }
 
-  loadQuestions(schein: string, kategorie: string, unterkategorie?: string) {
+  loadQuestions(schein: string, kategorie: string, unterkategorie?: string, filter?: string) {
     this.loading.set(true);
     this.error.set(null);
-
-    const filterValue = this.filter();
-
-    // If filter is set and user not authenticated, redirect
-    if ((filterValue === 'incorrect' || filterValue === 'bookmarked') && !this.authService.getToken()) {
-      this.router.navigate(['/register']);
-      return;
-    }
-
-    // If filter is set, apply it
-    if (filterValue === 'incorrect' || filterValue === 'bookmarked') {
-      this.applyFilter(schein, kategorie, unterkategorie);
-      return;
-    }
-
-    // Normal question loading
     this.apiService.getQuestions(schein, kategorie).subscribe({
       next: (data) => {
         // Filter by unterkategorie if provided
@@ -169,9 +148,66 @@ export class QuestionViewComponent {
           filteredQuestions = data.filter(q => q.unterkategorie === unterkategorie);
         }
 
-        // Check user setting for random question order
-        const currentUser = this.authService.getCurrentUser();
-        const randomOrder = currentUser?.settings?.random_question_order || false;
+        // Apply filter if provided (for logged-in users)
+        if (filter && this.authService.getToken()) {
+          this.applyFilter(filteredQuestions, filter);
+        } else {
+          this.continueLoadingQuestions(filteredQuestions);
+        }
+      },
+      error: (err) => {
+        console.error('Fehler beim Laden der Fragen:', err);
+        this.error.set('Fehler beim Laden der Fragen');
+        this.loading.set(false);
+      }
+    });
+  }
+
+  private applyFilter(questions: Question[], filter: string) {
+    // Lade Fortschrittsdaten
+    this.apiService.getQuestionProgress().subscribe({
+      next: (response: any) => {
+        const progressMap = new Map<number, QuestionProgress>();
+        if (response.fortschritte) {
+          response.fortschritte.forEach((p: QuestionProgress) => {
+            progressMap.set(p.frage_id, p);
+          });
+        }
+
+        let filteredQuestions = questions;
+
+        if (filter === 'incorrect') {
+          // Nur falsch beantwortete Fragen
+          filteredQuestions = questions.filter(q => {
+            const progress = progressMap.get(q.frage_id);
+            return progress && progress.zuletzt_richtig === false;
+          });
+        } else if (filter === 'bookmarked') {
+          // Nur gemerkte Fragen
+          filteredQuestions = questions.filter(q => {
+            const progress = progressMap.get(q.frage_id);
+            return progress && progress.ist_gemerkt === true;
+          });
+        }
+
+        if (filteredQuestions.length === 0) {
+          this.error.set('Keine Fragen gefunden für diesen Filter');
+          this.loading.set(false);
+        } else {
+          this.continueLoadingQuestions(filteredQuestions);
+        }
+      },
+      error: (err) => {
+        console.error('Fehler beim Laden des Fortschritts:', err);
+        this.continueLoadingQuestions(questions); // Fallback: alle Fragen anzeigen
+      }
+    });
+  }
+
+  private continueLoadingQuestions(filteredQuestions: Question[]) {
+    // Check user setting for random question order
+    const currentUser = this.authService.getCurrentUser();
+    const randomOrder = currentUser?.settings?.random_question_order || false;
 
         if (randomOrder) {
           filteredQuestions = this.shuffleArray(filteredQuestions);
@@ -222,6 +258,12 @@ export class QuestionViewComponent {
             console.warn('Session create failed (may be unsupported):', err);
           }
         });
+
+        // Lade Bookmarks für eingeloggte Benutzer
+        if (this.authService.getToken()) {
+          this.loadBookmarks();
+        }
+
         this.loading.set(false);
       },
       error: (err) => {
@@ -341,12 +383,12 @@ export class QuestionViewComponent {
       next: (response) => {
         console.log('Antwort eingereicht:', response);
 
-        // Save question progress
+        // Speichere Fragenfortschritt (richtig/falsch)
         this.apiService.saveQuestionProgress({
           frage_id: question.frage_id,
-          ist_richtig: response.is_correct ? 1 : 0,
-          ist_gemerkt: this.isBookmarked() ? 1 : 0
+          ist_richtig: response.is_correct
         }).subscribe({
+          next: () => console.log('Fortschritt gespeichert'),
           error: (err) => console.warn('Fortschritt konnte nicht gespeichert werden:', err)
         });
 
@@ -469,15 +511,6 @@ export class QuestionViewComponent {
         next: (response) => {
           console.log('Antwort als falsch gewertet:', response);
 
-          // Save question progress as incorrect
-          this.apiService.saveQuestionProgress({
-            frage_id: question.frage_id,
-            ist_richtig: 0,
-            ist_gemerkt: this.isBookmarked() ? 1 : 0
-          }).subscribe({
-            error: (err) => console.warn('Fortschritt konnte nicht gespeichert werden:', err)
-          });
-
           // Speichere Ergebnis
           const currentResults = this.answerResults();
           currentResults.push({
@@ -530,7 +563,7 @@ export class QuestionViewComponent {
 
     const token = this.authService.getToken();
     if (!token) {
-      this.router.navigate(['/register']);
+      alert('Bitte melden Sie sich an, um Fragen zu merken');
       return;
     }
 
@@ -538,7 +571,7 @@ export class QuestionViewComponent {
     const isCurrentlyBookmarked = bookmarked.has(question.frage_id);
     const newBookmarkedState = !isCurrentlyBookmarked;
 
-    // Optimistic update
+    // Optimistisches Update
     const newSet = new Set(bookmarked);
     if (newBookmarkedState) {
       newSet.add(question.frage_id);
@@ -547,15 +580,16 @@ export class QuestionViewComponent {
     }
     this.bookmarkedQuestions.set(newSet);
 
-    // Save to backend
-    this.apiService.toggleBookmark(question.frage_id, newBookmarkedState ? 1 : 0).subscribe({
+    // Backend speichern
+    this.apiService.toggleBookmark(question.frage_id, newBookmarkedState).subscribe({
       next: () => {
-        console.log('Bookmark updated');
+        console.log('Bookmark gespeichert:', question.frage_id, newBookmarkedState);
       },
       error: (err) => {
-        console.error('Fehler beim Aktualisieren des Lesezeichens:', err);
-        // Revert on error
+        console.error('Fehler beim Speichern des Bookmarks:', err);
+        // Rollback bei Fehler
         this.bookmarkedQuestions.set(bookmarked);
+        alert('Fehler beim Speichern der Markierung');
       }
     });
   }
@@ -566,128 +600,21 @@ export class QuestionViewComponent {
     return this.bookmarkedQuestions().has(question.frage_id);
   }
 
-  private applyFilter(schein: string, kategorie: string, unterkategorie?: string) {
-    const filterValue = this.filter();
-
-    this.apiService.getQuestionProgress().subscribe({
-      next: (response: QuestionProgress | { fortschritte: QuestionProgress[] }) => {
-        // Backend kann entweder Array oder Objekt mit fortschritte-Property zurückgeben
-        const progressData = Array.isArray(response)
-          ? response
-          : 'fortschritte' in response
-            ? response.fortschritte
-            : [];
-
-        let filteredQuestionIds: number[] = [];
-
-        if (filterValue === 'incorrect') {
-          // Nur Fragen, die zuletzt falsch beantwortet wurden UND weniger als 3x hintereinander richtig
-          filteredQuestionIds = progressData
-            .filter(p => p.zuletzt_richtig === 0 || (p.zuletzt_richtig === 1 && p.richtig_hintereinander < 3))
-            .map(p => p.frage_id);
-        } else if (filterValue === 'bookmarked') {
-          filteredQuestionIds = progressData
-            .filter(p => p.ist_gemerkt === 1)
-            .map(p => p.frage_id);
-        }
-
-        if (filteredQuestionIds.length === 0) {
-          this.error.set('Keine Fragen gefunden für diesen Filter.');
-          this.loading.set(false);
-          return;
-        }
-
-        // Load questions and filter them
-        this.continueLoadingQuestions(schein, kategorie, unterkategorie, filteredQuestionIds);
-      },
-      error: (err) => {
-        console.error('Fehler beim Laden des Fortschritts:', err);
-        this.error.set('Fehler beim Laden des Fortschritts.');
-        this.loading.set(false);
-      }
-    });
-  }
-
-  private continueLoadingQuestions(schein: string, kategorie: string, unterkategorie: string | undefined, filteredQuestionIds: number[]) {
-    // Wenn kategorie 'alle' ist, laden wir alle Fragen ohne Kategorie-Filter
-    const kategorieParam = kategorie === 'alle' ? undefined : kategorie;
-
-    this.apiService.getQuestions(schein, kategorieParam).subscribe({
-      next: (data) => {
-        let filteredQuestions = data.filter(q => filteredQuestionIds.includes(q.frage_id));
-
-        if (unterkategorie) {
-          filteredQuestions = filteredQuestions.filter(q => q.unterkategorie === unterkategorie);
-        }
-
-        // IMMER zufällige Reihenfolge für Filter (incorrect/bookmarked)
-        // Damit niemand sich die Reihenfolge merken kann
-        filteredQuestions = this.shuffleArray(filteredQuestions);
-
-        this.questions.set(filteredQuestions);
-        this.currentQuestionIndex.set(0);
-
-        const shuffledMap = new Map<number, any[]>();
-        filteredQuestions.forEach(q => {
-          if (q.antworten && q.antworten.length > 0) {
-            shuffledMap.set(q.frage_id, this.shuffleArray(q.antworten));
-          }
-        });
-        this.shuffledAnswers.set(shuffledMap);
-
-        this.sessionStart = Date.now();
-        this.questionStart = Date.now();
-        this.totalSessionSeconds = 0;
-        this.answeredCount = 0;
-        this.sessionId = null;
-
-        const currentUser = this.authService.getCurrentUser();
-        const payload: any = {
-          user_id: currentUser ? currentUser.id : null,
-          session_type: 'kategorie',
-          schein_filter: this.schein(),
-          kategorie_filter: this.kategorie()
-        };
-
-        this.apiService.createSession(payload).subscribe({
-          next: (resp) => {
-            if (resp && (resp.session_id || resp.sessionId || resp.id)) {
-              this.sessionId = resp.session_id || resp.sessionId || resp.id;
-            }
-          },
-          error: (err) => console.warn('Session create failed:', err)
-        });
-
-        this.loading.set(false);
-      },
-      error: (err) => {
-        console.error('Fehler beim Laden der Fragen:', err);
-        this.error.set('Fehler beim Laden der Fragen.');
-        this.loading.set(false);
-      }
-    });
-  }
-
   private loadBookmarks() {
     this.apiService.getQuestionProgress().subscribe({
-      next: (response: QuestionProgress | { fortschritte: QuestionProgress[] }) => {
-        // Backend kann entweder Array oder Objekt mit fortschritte-Property zurückgeben
-        const progressData = Array.isArray(response)
-          ? response
-          : 'fortschritte' in response
-            ? response.fortschritte
-            : [];
-
-        // Load all bookmarked question IDs
-        const bookmarked = new Set<number>(
-          progressData
-            .filter(p => p.ist_gemerkt === 1)
-            .map(p => p.frage_id)
-        );
-        this.bookmarkedQuestions.set(bookmarked);
+      next: (response: any) => {
+        if (response.fortschritte) {
+          const bookmarked = new Set<number>();
+          response.fortschritte.forEach((progress: QuestionProgress) => {
+            if (progress.ist_gemerkt) {
+              bookmarked.add(progress.frage_id);
+            }
+          });
+          this.bookmarkedQuestions.set(bookmarked);
+        }
       },
       error: (err) => {
-        console.warn('Fehler beim Laden der Lesezeichen:', err);
+        console.error('Fehler beim Laden der Bookmarks:', err);
       }
     });
   }

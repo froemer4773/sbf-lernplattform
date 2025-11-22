@@ -165,4 +165,8 @@ export class CategorySelectionComponent {
   goBack() {
     this.router.navigate(['/dashboard']);
   }
+
+  isAuthenticated(): boolean {
+    return !!this.authService.getToken();
+  }
 }

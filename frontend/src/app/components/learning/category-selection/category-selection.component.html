@@ -42,6 +42,44 @@
       @if (categories().length > 0) {
         <div class="categories-section">
           <div class="categories-list">
+            <!-- Falsch beantwortete Fragen (nur für eingeloggte User) -->
+            @if (isAuthenticated()) {
+              <a
+                [routerLink]="['/learning/questions', selectedLicense(), 'alle']"
+                [queryParams]="{filter: 'incorrect'}"
+                class="category-item filter-option incorrect"
+              >
+                <div class="category-icon">
+                  <span>❌</span>
+                </div>
+                <div class="category-content">
+                  <h3 class="category-title">Falsch beantwortete Fragen</h3>
+                  <p class="category-subtitle">Alle falsch beantworteten Fragen</p>
+                </div>
+                <div class="category-arrow">
+                  <span>›</span>
+                </div>
+              </a>
+
+              <!-- Gemerkte Fragen -->
+              <a
+                [routerLink]="['/learning/questions', selectedLicense(), 'alle']"
+                [queryParams]="{filter: 'bookmarked'}"
+                class="category-item filter-option bookmarked"
+              >
+                <div class="category-icon">
+                  <span>★</span>
+                </div>
+                <div class="category-content">
+                  <h3 class="category-title">Gemerkte Fragen</h3>
+                  <p class="category-subtitle">Alle gemerkten Fragen</p>
+                </div>
+                <div class="category-arrow">
+                  <span>›</span>
+                </div>
+              </a>
+            }
+
             @for (category of categories(); track category.name) {
               <div
                 class="category-item"
@@ -69,7 +107,7 @@
         <div class="subcategories-section">
           <h2>Unterkategorie wählen</h2>
           <div class="subcategories-list">
-            <!-- Alle Option -->
+            <!-- Alle Fragen Option -->
             <a
               [routerLink]="['/learning/questions', selectedLicense(), selectedCategory()]"
               class="subcategory-item all-option"
@@ -78,13 +116,14 @@
                 <span>📚</span>
               </div>
               <div class="subcategory-content">
-                <h3 class="subcategory-title">Alle</h3>
+                <h3 class="subcategory-title">Alle Fragen</h3>
                 <p class="subcategory-subtitle">{{ getTotalQuestionsForCategory() }} Fragen</p>
               </div>
               <div class="subcategory-arrow">
                 <span>›</span>
               </div>
             </a>
+
             <!-- Individual Subcategories -->
             @for (subcategory of subcategories(); track subcategory.name) {
               <a

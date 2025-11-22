@@ -11,7 +11,8 @@ import {
   SubmitAnswerRequest,
   SubmitAnswerResponse,
   ExamBogen,
-  ExamBogenDetails
+  ExamBogenDetails,
+  QuestionProgress
 } from '../models/models';
 
 @Injectable({
@@ -117,5 +118,29 @@ export class ApiService {
     return this.http.get<{ success: boolean; ergebnis: any }>(
       `${this.apiUrl}/exams/results.php?id=${id}`
     );
+  }
+
+  // ===== Fragenfortschritt (gemerkt, richtig/falsch) =====
+
+  getQuestionProgress(frageId?: number): Observable<QuestionProgress | { fortschritte: QuestionProgress[] }> {
+    const url = frageId
+      ? `${this.apiUrl}/progress/question-progress.php?frage_id=${frageId}`
+      : `${this.apiUrl}/progress/question-progress.php`;
+    return this.http.get<any>(url);
+  }
+
+  saveQuestionProgress(data: {
+    frage_id: number;
+    ist_richtig?: number;  // 0 oder 1
+    ist_gemerkt?: number   // 0 oder 1
+  }): Observable<{ success: boolean; message: string }> {
+    return this.http.post<{ success: boolean; message: string }>(
+      `${this.apiUrl}/progress/question-progress.php`,
+      data
+    );
+  }
+
+  toggleBookmark(frageId: number, ist_gemerkt: number): Observable<{ success: boolean; message: string }> {
+    return this.saveQuestionProgress({ frage_id: frageId, ist_gemerkt: ist_gemerkt });
   }
 }

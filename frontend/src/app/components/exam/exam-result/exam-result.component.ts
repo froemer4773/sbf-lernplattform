@@ -171,12 +171,28 @@ export class ExamResultComponent implements OnInit {
       next: (response) => {
         console.log('Prüfungsergebnis gespeichert:', response);
         this.saving = false;
+
+        // Speichere auch Fragenfortschritt (richtig/falsch)
+        this.savequestionProgress();
       },
       error: (err) => {
         console.error('Fehler beim Speichern:', err);
         this.saveError = 'Ergebnis konnte nicht gespeichert werden';
         this.saving = false;
       }
+    });
+  }
+
+  private savequestionProgress(): void {
+    // Speichere für jede Frage, ob sie richtig oder falsch beantwortet wurde
+    this.detailedResults.forEach(result => {
+      this.apiService.saveQuestionProgress({
+        frage_id: result.frage.id,
+        ist_richtig: result.isCorrect ? 1 : 0
+      }).subscribe({
+        next: () => console.log('Fortschritt gespeichert für Frage:', result.frage.id),
+        error: (err) => console.warn('Fortschritt konnte nicht gespeichert werden:', err)
+      });
     });
   }
 }

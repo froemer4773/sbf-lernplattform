@@ -36,6 +36,23 @@
           <!-- Frage Text -->
           <h2 class="question-title">{{ question.frage_text }}</h2>
 
+          <!-- Bookmark Checkbox -->
+          @if (isAuthenticated()) {
+            <div class="bookmark-section">
+              <label class="bookmark-checkbox">
+                <input
+                  type="checkbox"
+                  [checked]="isBookmarked()"
+                  (change)="toggleBookmark()"
+                />
+                <span class="bookmark-label">
+                  <span class="bookmark-icon">{{ isBookmarked() ? '★' : '☆' }}</span>
+                  Frage merken
+                </span>
+              </label>
+            </div>
+          }
+
           <!-- Frage Bild (falls vorhanden) -->
           @if (question.has_image) {
             <div class="question-image">

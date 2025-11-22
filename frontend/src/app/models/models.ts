@@ -38,12 +38,23 @@ export interface Question {
   korrekte_antwort: string;
   has_image: boolean;
   antworten: Answer[];
+  fortschritt?: QuestionProgress; // Optional: Fortschritt für diese Frage
 }
 
 export interface Answer {
   buchstabe: string;
   text: string;
   ist_korrekt: number;
+}
+
+export interface QuestionProgress {
+  frage_id: number;
+  ist_gemerkt: number; // 0 oder 1 (wie vom Backend)
+  zuletzt_richtig: number | null; // 0 oder 1 oder null
+  richtig_beantwortet_anzahl: number;
+  falsch_beantwortet_anzahl: number;
+  richtig_hintereinander: number; // Anzahl richtig hintereinander
+  letzte_beantwortung: string | null;
 }
 
 export interface Progress {

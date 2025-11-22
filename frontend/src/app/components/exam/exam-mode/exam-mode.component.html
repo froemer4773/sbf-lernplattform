@@ -100,6 +100,23 @@
           {{ currentQuestion.frage_text }}
         </div>
 
+        <!-- Bookmark Checkbox (nur für eingeloggte User) -->
+        @if (isAuthenticated()) {
+          <div class="bookmark-section">
+            <label class="bookmark-checkbox">
+              <input
+                type="checkbox"
+                [checked]="isBookmarked()"
+                (change)="toggleBookmark()"
+              />
+              <span class="bookmark-label">
+                <span class="bookmark-icon">{{ isBookmarked() ? '★' : '☆' }}</span>
+                Frage merken
+              </span>
+            </label>
+          </div>
+        }
+
         @if (currentQuestion.bild_url) {
           <div class="question-image">
             <img [src]="getQuestionImageUrl(currentQuestion.id)" [alt]="'Bild zu Frage ' + currentQuestion.id">

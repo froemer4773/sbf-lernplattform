@@ -92,8 +92,47 @@
         font-size: $font-size-h3;
         font-weight: $font-weight-semibold;
         color: $text-primary;
-        margin-bottom: $spacing-xl;
+        margin-bottom: $spacing-lg;
         line-height: $line-height-relaxed;
+      }
+
+      .bookmark-section {
+        margin-bottom: $spacing-xl;
+
+        .bookmark-checkbox {
+          display: inline-flex;
+          align-items: center;
+          gap: $spacing-sm;
+          cursor: pointer;
+          padding: $spacing-sm $spacing-md;
+          border-radius: $border-radius-base;
+          transition: background-color $transition-fast;
+
+          &:hover {
+            background-color: lighten($bg-tertiary, 3%);
+          }
+
+          input[type="checkbox"] {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+            accent-color: $accent-primary;
+          }
+
+          .bookmark-label {
+            display: flex;
+            align-items: center;
+            gap: $spacing-xs;
+            color: $text-secondary;
+            font-size: $font-size-base;
+            user-select: none;
+
+            .bookmark-icon {
+              font-size: 1.2em;
+              color: $accent-primary;
+            }
+          }
+        }
       }
 
       .question-image {
